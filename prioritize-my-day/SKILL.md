@@ -1,5 +1,5 @@
 ---
-name: funnelstory-prioritize-my-day
+name: prioritize-my-day
 description: >
   FunnelStory-first daily prioritization for CSMs. Trigger when the user says
   "Prioritize My Day", "what should I prioritize today", or "today's CSM priorities".
