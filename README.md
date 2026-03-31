@@ -8,6 +8,7 @@ The skills today cover customer intelligence and GTM artifacts:
 - **Meeting prep** — a short pre-call brief with recent activity, risks, open work, and context.
 - **QBR** — a Quarterly Business Review deck: metrics, notes, activities, renewal readiness.
 - **Case study** — a styled, self-contained HTML case study ready to share or publish.
+- **Prioritize My Day** — a ranked daily action plan for a CSM using tasks, needle movers, notes, meetings, topics, support, and renewal/health signals.
 
 All of them require the FunnelStory MCP to be connected so the agent can reach your data.
 
