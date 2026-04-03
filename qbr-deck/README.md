@@ -1,15 +1,10 @@
----
-name: qbr-deck-generator
-description: Generate Quarterly Business Review (QBR) decks for individual accounts. Trigger this skill whenever the user mentions "QBR deck", "quarterly business review", or wants to create a presentation summarizing account health, activities, or renewal readiness. The skill queries FunnelStory's semantic database to automatically extract account-specific data including notes, activities, account details/properties, predictions, and needle movers. Claude will guide the user through selecting output format (PowerPoint by default) and compile all relevant metrics into a polished, presentation-ready deck.
----
-
 # QBR Deck Generator
 
 Generate professional Quarterly Business Review decks for individual accounts using FunnelStory data.
 
-## When to Use This Skill
+## When to Use This Sub-Skill
 
-Use this skill whenever a user requests a QBR deck or quarterly business review for an account. The skill:
+Use this whenever a user requests a QBR deck or quarterly business review for an account. The skill:
 
 - Queries the FunnelStory semantic database for account-specific data
 - Extracts relevant business metrics, notes, activities, tickets, meetings, and insights
@@ -123,8 +118,8 @@ ORDER BY ABS(impact) DESC
 
 **Important**: `json_each` is not available on these virtual tables. Always use `INSTR(account_ids, account_id) > 0` to filter.
 
-Labels: `competitor`, `feature_request`, `task_issue_bug`, `pricing`, `personnel_change`, `action_item`  
-Impact: -10 (critical churn risk) to +10 (critical expansion). Negative = risk, positive = growth.  
+Labels: `competitor`, `feature_request`, `task_issue_bug`, `pricing`, `personnel_change`, `action_item`
+Impact: -10 (critical churn risk) to +10 (critical expansion). Negative = risk, positive = growth.
 States: `open`, `closed`, `acknowledged`, `done`
 
 ### Prediction History (trend)

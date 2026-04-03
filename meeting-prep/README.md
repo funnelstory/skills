@@ -1,9 +1,4 @@
----
-name: account-meeting-prep
-description: "Produces a concise Markdown meeting brief for one or more customer accounts by gathering all the data for that account using FunnelStory mcp. Use when preparing for a sales or success call, writing a pre-meeting summary or next steps with the account."
----
-
-# Meeting prep
+# Meeting Prep
 
 ## Before you start
 
