@@ -1,4 +1,4 @@
-# FunnelStory Skills
+# FunnelStory CS Skills
 
 [Agent Skills](https://agentskills.io) for the FunnelStory MCP server.
 
