@@ -2,6 +2,10 @@
 
 [Agent Skills](https://agentskills.io) for the FunnelStory MCP server.
 
+## Get started
+
+Download: https://github.com/funnelstory/skills/archive/main.zip
+
 ## Layout
 
 - **`SKILL.md`** (repo root) — main skill entrypoint. It covers MCP setup, how to scope requests (named account vs portfolio), and a routing table to the right sub-skill.
