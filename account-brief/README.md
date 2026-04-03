@@ -1,16 +1,4 @@
----
-name: funnelstory-account-brief
-description: >
-  Use this skill to generate an account summary brief using the FunnelStory MCP.
-  Trigger this skill whenever the user mentions "account summary", "account brief",
-  "customer brief", or asks to summarize, review, or report on a specific customer
-  or account — even if they don't say "FunnelStory" explicitly. Also trigger when
-  the user asks about account health, usage, contacts, support tickets, or purchased
-  products for a named account.
-compatibility: "Requires FunnelStory MCP to be connected (SQLite semantic database)"
----
-
-# FunnelStory Account Brief Skill
+# FunnelStory Account Brief
 
 Generate a structured, professional account summary brief for a named customer using FunnelStory's semantic database.
 
