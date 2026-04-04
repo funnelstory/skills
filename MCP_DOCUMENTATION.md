@@ -102,7 +102,7 @@ FunnelStory supports Dynamic Client Registration (DCR), so your client registers
 
 ## Privacy Policy
 
-See our privacy policy: https://funnelstory.ai/privacy
+See our privacy policy: https://funnelstory.ai/privacy-policy
 
 ## Support
 
