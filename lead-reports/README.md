@@ -6,11 +6,11 @@ Produce **repeatable, executive-style reports** from the customer's **FunnelStor
 
 **Common report names (pick one framing per run):**
 
-| Framing                           | Typical use                                                                             |
-| --------------------------------- | --------------------------------------------------------------------------------------- |
-| **Hot leads**                     | New or recent accounts with strong product usage worth immediate sales attention        |
-| **Product-qualified leads (PQL)** | Usage breadth/depth crosses a defined product threshold                                 |
-| **Conversion opportunities**      | Free/trial/community cohorts showing signals correlated with upgrade or paid conversion |
+| Framing | Typical use |
+|--------|-------------|
+| **Hot leads** | New or recent accounts with strong product usage worth immediate sales attention |
+| **Product-qualified leads (PQL)** | Usage breadth/depth crosses a defined product threshold |
+| **Conversion opportunities** | Free/trial/community cohorts showing signals correlated with upgrade or paid conversion |
 
 The workflow is **not** tied to any single product or workspace: the operator supplies **workspace id**, **product/report naming**, **cohort filters**, and **scoring rules** (or reuses their existing FunnelStory agent SQL).
 
