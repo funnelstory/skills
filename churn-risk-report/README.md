@@ -26,7 +26,7 @@ Convert prediction scores to 0–100 for display if the workspace uses -1..1: `(
 ## Step 3 — Query pattern
 
 - Pull accounts with renewal dates and scores.
-- Join or post-filter `needle_movers` with `INSTR(account_ids, account_id) > 0` when JSON array helpers are unavailable (same pattern as other FunnelStory skills).
+- Join or post-filter `needle_movers` with `INSTR(account_ids, account_id) > 0` (the `account_ids` field is text-based, not a JSON array).
 
 ## Step 4 — Report structure
 

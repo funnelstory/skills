@@ -204,7 +204,7 @@ Save to `/mnt/user-data/outputs/[account-name]-account-brief.docx` and use `pres
 
 ## Implementation Notes
 
-- **JSON arrays**: `json_each` is not available. Use `INSTR(col, value) > 0` for array membership (e.g. `needle_movers.account_ids`).
+- **JSON arrays**: Use `json_each(col)` for proper JSON array columns (e.g. `accounts.assignees`). For text-based array fields like `needle_movers.account_ids`, use `INSTR(col, value) > 0` instead.
 - **JSON field extraction**: Use `json_extract(col, '$.field')` — e.g. `json_extract(key, '$.ticket_id')`.
 - **Prediction score display**: Convert -1→1 to 0–100 via `(score * 50) + 50`.
 - **Notes content**: Strip HTML tags before including in the brief.

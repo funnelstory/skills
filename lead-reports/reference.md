@@ -6,23 +6,23 @@ Fill **Configuration** first. Then run SQL (customer-specific or adapted from th
 
 ## Configuration (copy and fill)
 
-| Placeholder                   | Example                                               | Notes                                           |
-| ----------------------------- | ----------------------------------------------------- | ----------------------------------------------- |
-| `WORKSPACE_ID`                | UUID from FunnelStory URL or workspace settings       | Required for account deep links                 |
-| `PRODUCT_NAME`                | Acme Platform                                         | Title bar and footer                            |
-| `REPORT_TITLE`                | Hot leads · January 2026                              | Full header string                              |
-| `PRIMARY_SECTION_TITLE`       | Hot leads / PQLs / Conversion opportunities           | Main list section                               |
-| `PRIMARY_QUALIFICATION_LABEL` | Why hot / Why qualified / Why prioritize              | Short label above narrative                     |
-| `KPI_1_LABEL`                 | Report period                                         | First KPI box                                   |
-| `KPI_2_LABEL`                 | New accounts (cohort)                                 | Second KPI                                      |
-| `KPI_3_LABEL`                 | Qualified leads                                       | Third KPI; value = row count of qualified list  |
-| `SECONDARY_SECTION_TITLE`     | High activity — reviewed & not prioritized            | Optional; omit section if no third query        |
-| `SECONDARY_RATIONALE_LABEL`   | Why not prioritized                                   | Label for `exclusion_reason`                    |
-| `NOISE_ACTIVITIES`            | SQL list: `'Login'`, `'Created User'`, …              | Activities to **exclude** from meaningful usage |
-| `COHORT_TIME_FILTER`          | e.g. previous calendar month on `accounts.created_at` | Must be consistent across queries               |
-| `QUALIFIED_THRESHOLD`         | numeric                                               | Minimum composite score for primary list        |
-| `QUALIFIED_LIMIT`             | 20                                                    | Max rows primary list                           |
-| `FLAGGED_LIMIT`               | 15                                                    | Max rows secondary list                         |
+| Placeholder | Example | Notes |
+|-------------|---------|--------|
+| `WORKSPACE_ID` | UUID from FunnelStory URL or workspace settings | Required for account deep links |
+| `PRODUCT_NAME` | Acme Platform | Title bar and footer |
+| `REPORT_TITLE` | Hot leads · January 2026 | Full header string |
+| `PRIMARY_SECTION_TITLE` | Hot leads / PQLs / Conversion opportunities | Main list section |
+| `PRIMARY_QUALIFICATION_LABEL` | Why hot / Why qualified / Why prioritize | Short label above narrative |
+| `KPI_1_LABEL` | Report period | First KPI box |
+| `KPI_2_LABEL` | New accounts (cohort) | Second KPI |
+| `KPI_3_LABEL` | Qualified leads | Third KPI; value = row count of qualified list |
+| `SECONDARY_SECTION_TITLE` | High activity — reviewed & not prioritized | Optional; omit section if no third query |
+| `SECONDARY_RATIONALE_LABEL` | Why not prioritized | Label for `exclusion_reason` |
+| `NOISE_ACTIVITIES` | SQL list: `'Login'`, `'Created User'`, … | Activities to **exclude** from meaningful usage |
+| `COHORT_TIME_FILTER` | e.g. previous calendar month on `accounts.created_at` | Must be consistent across queries |
+| `QUALIFIED_THRESHOLD` | numeric | Minimum composite score for primary list |
+| `QUALIFIED_LIMIT` | 20 | Max rows primary list |
+| `FLAGGED_LIMIT` | 15 | Max rows secondary list |
 
 **FunnelStory account URL pattern** (encode `account_id` for query string as needed):
 
@@ -202,10 +202,10 @@ Build the complete HTML. KPI row: three equal-height boxes. Lead sections: full-
 
 ## Report-type wording (swap in «REPORT_STYLE» / section titles)
 
-| Goal       | Example `REPORT_TITLE`                  | Example `PRIMARY_SECTION_TITLE` | Example `PRIMARY_QUALIFICATION_LABEL` |
-| ---------- | --------------------------------------- | ------------------------------- | ------------------------------------- |
-| Hot leads  | Hot leads · February 2026               | Hot leads                       | Why hot                               |
-| PQL        | Product-qualified leads · Q1 2026       | Product-qualified leads         | Why PQL                               |
-| Conversion | Conversion opportunities · Trial cohort | Conversion opportunities        | Why prioritize                        |
+| Goal | Example `REPORT_TITLE` | Example `PRIMARY_SECTION_TITLE` | Example `PRIMARY_QUALIFICATION_LABEL` |
+|------|-------------------------|----------------------------------|----------------------------------------|
+| Hot leads | Hot leads · February 2026 | Hot leads | Why hot |
+| PQL | Product-qualified leads · Q1 2026 | Product-qualified leads | Why PQL |
+| Conversion | Conversion opportunities · Trial cohort | Conversion opportunities | Why prioritize |
 
 Keep **one** framing per report so the narrative stays coherent.
