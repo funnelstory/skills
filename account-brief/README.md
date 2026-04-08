@@ -1,16 +1,4 @@
----
-name: funnelstory-account-brief
-description: >
-  Use this skill to generate an account summary brief using the FunnelStory MCP.
-  Trigger this skill whenever the user mentions "account summary", "account brief",
-  "customer brief", or asks to summarize, review, or report on a specific customer
-  or account — even if they don't say "FunnelStory" explicitly. Also trigger when
-  the user asks about account health, usage, contacts, support tickets, or purchased
-  products for a named account.
-compatibility: "Requires FunnelStory MCP to be connected (SQLite semantic database)"
----
-
-# FunnelStory Account Brief Skill
+# FunnelStory Account Brief
 
 Generate a structured, professional account summary brief for a named customer using FunnelStory's semantic database.
 
@@ -216,7 +204,7 @@ Save to `/mnt/user-data/outputs/[account-name]-account-brief.docx` and use `pres
 
 ## Implementation Notes
 
-- **JSON arrays**: `json_each` is not available. Use `INSTR(col, value) > 0` for array membership (e.g. `needle_movers.account_ids`).
+- **JSON arrays**: Use `json_each(col)` for proper JSON array columns (e.g. `accounts.assignees`). For text-based array fields like `needle_movers.account_ids`, use `INSTR(col, value) > 0` instead.
 - **JSON field extraction**: Use `json_extract(col, '$.field')` — e.g. `json_extract(key, '$.ticket_id')`.
 - **Prediction score display**: Convert -1→1 to 0–100 via `(score * 50) + 50`.
 - **Notes content**: Strip HTML tags before including in the brief.

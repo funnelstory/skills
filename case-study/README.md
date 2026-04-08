@@ -1,14 +1,4 @@
----
-name: funnelstory-case-study-html
-description: >
-  Generate a visually polished, publication-ready customer case study rendered as a styled HTML
-  artifact (Claude canvas) for any FunnelStory account. Use this skill when the user asks for a
-  visual case study, an HTML case study, a designed case study, or says they want something that
-  looks good enough to share or publish — even if they just say "fancy case study for Acme" or
-  "make a visual version". Requires the FunnelStory MCP to be connected.
----
-
-## What this skill does
+# Case Study — Publication-Ready HTML
 
 Fetches all account data from FunnelStory's semantic database and outputs a complete, self-contained
 HTML artifact that Claude renders as a canvas. The result looks like a real published case study —
