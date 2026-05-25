@@ -26,6 +26,8 @@ Everything requires the FunnelStory MCP so the agent can query your Customer Int
 | `value-email/` | Customer-facing ROI / value recap email |
 | `exec-sponsor/` | Executive sponsor coverage and gaps |
 | `flow-authoring/` | Workflow / automation design |
+| `connection-queries/` | Connection query syntax (SQL, SOQL, HubSpot, Attio blocks) |
+| `configure-data-model/` | Data model configuration via MCP (mappings, joins, preview, save) |
 
 ## Usage
 
