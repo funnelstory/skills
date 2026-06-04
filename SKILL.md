@@ -127,7 +127,7 @@ When intent is ambiguous, apply these rules:
 - **Churn risk vs Book of business**: Churn risk = ranked danger report with drivers and plays. Book of business = personal portfolio snapshot with health + drill-down. If they say "how are my accounts doing?", use book-of-business. If they say "which accounts might churn?", use churn-risk-report.
 - **Value email vs Account brief**: Value email = outbound to the customer (achievements, CTA). Account brief = internal deep-dive for stakeholders.
 - **Lead reports vs Expansion/Upsell**: Lead reports = net-new, trial, or free-tier accounts that are product-qualified. Expansion/Upsell = existing paying customers with room to grow.
-- **QBR deck vs PPTX deck builder**: QBR sub-skills (`qbr-internal/`, `qbr-external/`, `qbr-deck/`) = generate a one-off quarterly review deck from semantic data. PPTX deck builder = build a saved FunnelStory flow that generates `.pptx` files per account on a schedule or trigger, with iterative layout tuning via `read_presentation`.
+- **QBR deck vs PPTX deck builder**: QBR sub-skills (`qbr-internal/`, `qbr-external/`, `qbr-deck/`) = generate a one-off quarterly review deck from semantic data. PPTX deck builder = build a saved FunnelStory flow that generates `.pptx` files per account on a schedule or trigger, in two steps: first iterate visually in chat, then encode as a deterministic flow.
 
 ## Audience
 
