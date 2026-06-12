@@ -25,6 +25,17 @@ For persona-specific trigger examples, see `references/use-cases.md`.
 - **JSON arrays:** Use `json_each(col)` for proper JSON array columns (e.g. `assignees`). For text-based array fields (e.g. `needle_movers.account_ids`), use `INSTR(col, value) > 0` instead.
 - **JSON fields:** Use `json_extract(col, '$.field')` for nested property access.
 
+## MCP resources — read these BEFORE calling tools
+
+The FunnelStory MCP exposes **resources** (readable via the **`read_resource`** tool) containing the schema, value semantics, and workspace-specific context that queries and configs depend on. Several tools **require** specific resources to be read before they are called — this requirement is stated in each tool's own description, and the list of available resources is discoverable at runtime (via the MCP resource list, or the URI options on `read_resource`).
+
+**Rules:**
+
+1. **Discover the resources.** List the available resources at the start of a session — resources may be added or changed at any time.
+2. **Always read the workspace profile** (`file://workspace/profile.json`) before answering any question about accounts, metrics, or business data. It contains workspace-specific terminology and instructions that override generic assumptions.
+3. **Before calling any MCP tool, check its description for required resources and read them first.** For example, the semantic-DB query tool requires its usage guide and schema resources; flow and data-model tools require their respective guides.
+4. **Once per session is enough.** Read each resource a single time and reuse what you learned for subsequent calls.
+
 ## Step 0 — Identify the user
 
 Many sub-skills need to know *whose* accounts to query. **Before doing anything else**, determine whether the request is scoped to the user's own accounts or to a named account.
