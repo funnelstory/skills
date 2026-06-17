@@ -18,7 +18,7 @@ For troubleshooting common issues, see `references/troubleshooting.md`.
 For persona-specific trigger examples, see `references/use-cases.md`.
 
 ## Prerequisites
-
+- **Read context resources first (always).** Before doing any work on a request — querying data, routing to a sub-skill, or producing a deliverable — call the **`read_resource`** tool with the relevant resource URI(s) to load the current context for the task. The MCP server exposes reference context (schema, field definitions, workspace configuration, and similar) addressable by URI. Identify which resource(s) the request depends on, read them with `read_resource`, and only then proceed. Do not rely on assumed schema, field names, or prior-session memory when a resource can confirm the current state — read first, then act.
 - **FunnelStory MCP** must be connected (login via OTP if required).
 - Use **`get_data_connections`** to locate the Semantic DB `connection_id`.
 - Use **`execute_query`** to run SQLite against that connection. Set `limit` high enough to avoid truncation (e.g. 25+ rows).
