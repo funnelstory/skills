@@ -26,6 +26,7 @@ Everything requires the FunnelStory MCP so the agent can query your Customer Int
 | `value-email/` | Customer-facing ROI / value recap email |
 | `exec-sponsor/` | Executive sponsor coverage and gaps |
 | `flow-authoring/` | Workflow / automation design |
+| `pptx-deck-builder/` | Automated PPTX flows (query → script.js → pptx.create) |
 
 ## Usage
 

@@ -6,7 +6,7 @@ description: >
   QBR decks (internal or customer-facing), case studies, lead/PQL reports, expansion dashboards,
   upsell dashboards, churn risk reports, renewal dashboards, adoption gap analysis, adoption
   funnels, health score breakdowns, success plans, value emails, executive sponsor tracking,
-  feature request dashboards, or customer ROI stories. Requires FunnelStory
+  feature request dashboards, or customer ROI stories, or automated PPTX deck flows. Requires FunnelStory
   MCP to be connected.
 ---
 
@@ -104,6 +104,13 @@ Match the user's intent to **exactly one** sub-folder. Read the `README.md` insi
 | ROI stories, customer outcomes for marketing, batch ROI | `customer-roi-stories/` | Multi-account batch; compact marketing-ready snippets |
 | Full case study, publication-ready HTML | `case-study/` | Single-account deep editorial narrative |
 
+### Flow automation
+
+| User intent | Sub-folder | Notes |
+|-------------|------------|-------|
+| Build or iterate an automated PPTX flow (query → script.js → pptx.create) | `pptx-deck-builder/` | Reusable per-account decks; test-run and iterate on layout |
+| General workflow / automation design | `flow-authoring/` | Broader flow patterns |
+
 ### Disambiguation rules
 
 When intent is ambiguous, apply these rules:
@@ -120,6 +127,7 @@ When intent is ambiguous, apply these rules:
 - **Churn risk vs Book of business**: Churn risk = ranked danger report with drivers and plays. Book of business = personal portfolio snapshot with health + drill-down. If they say "how are my accounts doing?", use book-of-business. If they say "which accounts might churn?", use churn-risk-report.
 - **Value email vs Account brief**: Value email = outbound to the customer (achievements, CTA). Account brief = internal deep-dive for stakeholders.
 - **Lead reports vs Expansion/Upsell**: Lead reports = net-new, trial, or free-tier accounts that are product-qualified. Expansion/Upsell = existing paying customers with room to grow.
+- **QBR deck vs PPTX deck builder**: QBR sub-skills (`qbr-internal/`, `qbr-external/`, `qbr-deck/`) = generate a one-off quarterly review deck from semantic data. PPTX deck builder = build a saved FunnelStory flow that generates `.pptx` files per account on a schedule or trigger, in two steps: first iterate visually in chat, then encode as a deterministic flow.
 
 ## Audience
 
