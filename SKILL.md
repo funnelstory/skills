@@ -3,6 +3,7 @@ name: funnelstory
 description: >
   FunnelStory MCP toolkit for Customer Success, Product, and Marketing teams. Use this skill
   for ANY request involving FunnelStory data: account briefs, book of business, meeting prep,
+  daily prioritization for a CSM,
   QBR decks (internal or customer-facing), case studies, lead/PQL reports, expansion dashboards,
   upsell dashboards, churn risk reports, renewal dashboards, adoption gap analysis, adoption
   funnels, health score breakdowns, success plans, value emails, executive sponsor tracking,
@@ -82,6 +83,7 @@ Match the user's intent to **exactly one** sub-folder. Read the `README.md` insi
 | User intent | Sub-folder | Notes |
 |-------------|------------|-------|
 | "My book", "my assigned accounts", portfolio snapshot | `book-of-business/` | Needs user email (Step 0) |
+| "Prioritize my day", what should I work on today, daily CS priorities | `prioritize-my-day/` | Needs current user or explicit scope; returns a ranked action plan |
 | Churn risk, at-risk accounts, retention danger | `churn-risk-report/` | Ranked risk report; all at-risk accounts regardless of renewal |
 | Renewals coming up, renewal pipeline, renewal readiness | `renewal-dashboard/` | Time-bounded (next 90 days); action-plan focused |
 | Expansion: more seats, users, sites, land-and-expand | `expansion-dashboard/` | Volume/geography growth |

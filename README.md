@@ -15,6 +15,7 @@ Everything requires the FunnelStory MCP so the agent can query your Customer Int
 | --- | --- |
 | `account-brief/` | Single-account summary / health deep-dive (internal) |
 | `book-of-business/` | “My book” — assigned accounts / portfolio snapshot |
+| `prioritize-my-day/` | Ranked daily priorities for a CSM across risk, renewal, and expansion |
 | `meeting-prep/` | Pre-call brief for a named account |
 | `qbr-deck/` | Quarterly Business Review deck (e.g. PowerPoint) |
 | `case-study/` | Publishable styled HTML case study |
