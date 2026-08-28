@@ -1,6 +1,10 @@
-# FunnelStory Skills
+# FunnelStory CS Skills
 
 [Agent Skills](https://agentskills.io) for the FunnelStory MCP server.
+
+## Get started
+
+Download: https://github.com/funnelstory/skills/archive/main.zip
 
 ## Layout
 
