@@ -1,13 +1,15 @@
 ---
 name: funnelstory
+version: 1.1.0
 description: >
   FunnelStory MCP toolkit for Customer Success, Product, and Marketing teams. Use this skill
   for ANY request involving FunnelStory data: account briefs, book of business, meeting prep,
-  QBR decks (internal or customer-facing), case studies, lead/PQL reports, expansion dashboards,
-  upsell dashboards, churn risk reports, renewal dashboards, adoption gap analysis, adoption
-  funnels, health score breakdowns, success plans, value emails, executive sponsor tracking,
-  feature request dashboards, customer ROI stories, data model configuration,
-  or connection query authoring. Requires FunnelStory MCP to be connected.
+  support history and open tickets for an account, QBR decks (internal or customer-facing),
+  case studies, lead/PQL reports, expansion dashboards, upsell dashboards, churn risk reports,
+  renewal dashboards, adoption gap analysis, adoption funnels, health score breakdowns,
+  success plans, value emails, executive sponsor tracking, feature request dashboards,
+  customer ROI stories, data model configuration, or connection query authoring.
+  Requires FunnelStory MCP to be connected.
 ---
 
 # FunnelStory — Customer Success toolkit
@@ -20,10 +22,12 @@ For persona-specific trigger examples, see `references/use-cases.md`.
 ## Prerequisites
 - **Read context resources first (always).** Before doing any work on a request — querying data, routing to a sub-skill, or producing a deliverable — call the **`read_resource`** tool with the relevant resource URI(s) to load the current context for the task. The MCP server exposes reference context (schema, field definitions, workspace configuration, and similar) addressable by URI. Identify which resource(s) the request depends on, read them with `read_resource`, and only then proceed. Do not rely on assumed schema, field names, or prior-session memory when a resource can confirm the current state — read first, then act.
 - **FunnelStory MCP** must be connected (login via OTP if required).
-- Use **`get_data_connections`** to locate the Semantic DB `connection_id`.
-- Use **`execute_query`** to run SQLite against that connection. Set `limit` high enough to avoid truncation (e.g. 25+ rows).
+- **Read `file://workspace/profile.json` before querying.** Its `instructions` field may override metric names, health conventions, or which fields may be surfaced. Workspace instructions take precedence over the defaults in any sub-skill README.
+- Use **`query_semantic_db`** to run SQLite against the semantic database. It takes raw SQL directly; no connection lookup is required. Set limits high enough to avoid truncation (e.g. 25+ rows).
+- Before writing queries, read `file://semantic/usage.md` and `file://semantic/schema.sql` via **`read_resource`**. Table and column availability differ between workspaces; confirm with `SELECT name FROM pragma_table_info('<table>')` when in doubt.
 - **JSON arrays:** Use `json_each(col)` for proper JSON array columns (e.g. `assignees`). For text-based array fields (e.g. `needle_movers.account_ids`), use `INSTR(col, value) > 0` instead.
 - **JSON fields:** Use `json_extract(col, '$.field')` for nested property access.
+- **Never `SELECT *`** on `tickets` or `conversations` — wide JSON columns such as `custom_fields` can carry dozens of fields per row. Name the columns you need.
 
 ## Step 0 — Identify the user
 
@@ -56,7 +60,7 @@ If both return no results, ask the user to list account names manually (see book
 
 3. Cache the email for the session — only ask once.
 
-**If the request names a specific account** (account brief, meeting prep, QBR, case study, value email, health score breakdown, success plan): skip this step and resolve the account by name in the sub-skill.
+**If the request names a specific account** (account brief, meeting prep, QBR, case study, value email, health score breakdown, success plan, support history): skip this step and resolve the account by name in the sub-skill.
 
 **If the request is workspace-wide** (feature requests dashboard, adoption funnel — typically PM/PMM personas): skip this step; query all accounts.
 
@@ -69,6 +73,7 @@ Match the user's intent to **exactly one** sub-folder. Read the `README.md` insi
 | User intent | Sub-folder | Notes |
 |-------------|------------|-------|
 | Summarize one named account, account health deep-dive | `account-brief/` | Internal-facing; single account |
+| Latest tickets, open escalations, support history for one account | `account-support-history/` | Single account; run linkage discovery first |
 | Why is the health score what it is, score factors and weights | `health-score-breakdown/` | Single account; focused on score mechanics |
 | Create a success plan, gap analysis + action plan | `success-plan/` | Single account; forward-looking |
 | Meeting prep, pre-call brief | `meeting-prep/` | Single account; user names it |
@@ -116,6 +121,8 @@ Match the user's intent to **exactly one** sub-folder. Read the `README.md` insi
 When intent is ambiguous, apply these rules:
 
 - **Health score breakdown vs Account brief**: Health score breakdown = laser-focused on the score mechanics (factors, weights, trends, what to fix). Account brief = full narrative across all dimensions (contacts, tickets, notes, usage, needle movers). If they ask "why is the health score low?", use health-score-breakdown. If they ask "tell me about this account", use account-brief.
+- **Account support history vs Account brief**: Support history = tickets, escalations, and customer conversations for one account, with open items called out. Account brief = full narrative across all dimensions, of which support is one section. If they ask "what's open with this account?" or "latest tickets", use account-support-history. If they ask "tell me about this account", use account-brief.
+- **Account support history vs Feature requests**: Support history = what one account raised, chronological. Feature requests = what customers asked for, aggregated across accounts and ranked. If they name a single account and want recency, use account-support-history.
 - **Success plan vs Account brief**: Success plan = forward-looking action plan with milestones and owners. Account brief = current-state snapshot. If they say "create a plan to improve this account", use success-plan. If they say "summarize this account", use account-brief.
 - **Success plan vs Adoption gap**: Success plan = single-account action plan combining usage AND qualitative gaps. Adoption gap = portfolio-wide report of accounts under-using. If they name one account and want a plan, use success-plan. If they want a list of under-using accounts, use adoption-gap.
 - **Renewal dashboard vs Churn risk report**: Renewal dashboard = time-bounded (next 90 days), focused on renewal readiness. Churn risk report = all at-risk accounts ranked by danger, regardless of renewal timing. If they say "who's renewing soon?", use renewal-dashboard. If they say "who might churn?", use churn-risk-report.
@@ -141,5 +148,6 @@ These skills serve four personas:
 
 - **`templates/html-dashboard.md`** — Shared HTML dashboard layout (KPI row, card grid, styling). Referenced by dashboard-style sub-skills.
 - **`templates/one-pager.md`** — Compact one-page summary template. Referenced when a quick format is requested.
+- **`references/linking-conversations-to-accounts.md`** — How to locate support data in a workspace and link it to accounts. Read before any per-account ticket or conversation query. Used by `account-support-history/` and `account-brief/`; also applies to `meeting-prep/` and `churn-risk-report/`.
 - **`references/troubleshooting.md`** — Common problems and how to handle them (MCP not connected, empty results, ambiguous names, etc.).
 - **`references/use-cases.md`** — Persona-specific trigger examples mapped to sub-skills.
