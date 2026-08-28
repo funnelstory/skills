@@ -6,8 +6,8 @@ description: >
   QBR decks (internal or customer-facing), case studies, lead/PQL reports, expansion dashboards,
   upsell dashboards, churn risk reports, renewal dashboards, adoption gap analysis, adoption
   funnels, health score breakdowns, success plans, value emails, executive sponsor tracking,
-  feature request dashboards, or customer ROI stories. Requires FunnelStory
-  MCP to be connected.
+  feature request dashboards, customer ROI stories, data model configuration,
+  or connection query authoring. Requires FunnelStory MCP to be connected.
 ---
 
 # FunnelStory — Customer Success toolkit
@@ -103,6 +103,13 @@ Match the user's intent to **exactly one** sub-folder. Read the `README.md` insi
 |-------------|------------|-------|
 | ROI stories, customer outcomes for marketing, batch ROI | `customer-roi-stories/` | Multi-account batch; compact marketing-ready snippets |
 | Full case study, publication-ready HTML | `case-study/` | Single-account deep editorial narrative |
+
+### Data model setup
+
+| User intent | Sub-folder | Notes |
+|-------------|------------|-------|
+| Write or validate a connection query (SQL, SOQL, HubSpot, Attio blocks) | `connection-queries/` | Use before configuring a model |
+| Create or update a data model, map columns, add joins, preview, save | `configure-data-model/` | Use after the query works |
 
 ### Disambiguation rules
 
