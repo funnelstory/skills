@@ -9,7 +9,7 @@ Use this sub-skill **before** [configure-data-model](../configure-data-model/REA
 ## Prerequisites
 
 - **FunnelStory MCP** connected for the target workspace.
-- **`get_data_connections`** — identify the source connection and its type.
+- **`query_semantic_db`** — identify the source connection and its type: `SELECT id, type, name FROM data_connections`.
 - **`get_data_connection_schema`** — list tables and columns before writing SQL (never invent column names).
 - **`preview_data_connection`** — validate the query returns expected columns and sample rows (up to 25) before using it in `preview_data_model` or `configure_data_model`.
 

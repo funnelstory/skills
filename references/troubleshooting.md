@@ -6,7 +6,7 @@ Common problems and how Claude should handle them.
 
 ## MCP not connected
 
-**What happened:** The FunnelStory MCP server is not available — `get_data_connections` or `execute_query` fails or is missing from the tool list.
+**What happened:** The FunnelStory MCP server is not available — `query_semantic_db` fails or is missing from the tool list.
 
 **What to do:**
 - Tell the user: "FunnelStory MCP isn't connected. Please enable it in your tools/connectors settings and try again."

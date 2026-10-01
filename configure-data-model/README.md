@@ -9,8 +9,7 @@ Configure FunnelStory data models via MCP tools: pick model type, map columns, a
 ## Prerequisites
 
 - **FunnelStory MCP** connected for the target workspace.
-- **`get_data_connections`** — locate source connections and the Semantic DB connection.
-- **`execute_query`** — inspect existing models in the semantic DB.
+- **`query_semantic_db`** — find source connections (`SELECT id, type, name FROM data_connections`) and inspect existing models (`data_models`). It takes raw SQL; no connection ID is needed.
 - **`get_data_connection_schema`** and **`preview_data_connection`** — validate queries (via connection-queries workflow).
 - **`preview_data_model`** — test the full config without saving.
 - **`configure_data_model`** — create or update a saved model.

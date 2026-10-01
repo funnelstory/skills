@@ -8,7 +8,7 @@
 ## Prerequisites
 
 - Use the **semantic schema** your MCP exposes (`get_models`, `list_tables`, or tool docs). Adapt all SQL to real column names.
-- Prefer `get_data_connections` → `execute_query` with a high enough `limit` for ranked lists.
+- Run SQL with `query_semantic_db` (raw SQL, no connection ID). Add a `LIMIT` large enough for ranked lists.
 
 ## Step 1 — Scope
 
