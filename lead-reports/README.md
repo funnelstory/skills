@@ -30,7 +30,7 @@ Automated FunnelStory agents add **email.send**; this skill stops at **deliverab
 
 ## On-demand workflow
 
-1. **Authenticate** — `login` (OTP flow) if required.
+1. **Authenticate** — the hosted MCP authorizes via OAuth on connect (see `MCP_DOCUMENTATION.md`); if your tenant server exposes a `login` tool, use it.
 2. **Check the tables** — read the semantic schema resource (`file://semantic/schema.sql`) so the SQL uses the real `accounts` and `activities` columns.
 3. **Confirm inputs with the user** — At minimum: **report type label**, **time window** (e.g. previous calendar month, last 30 days), **workspace UUID** for FunnelStory account links, **product/company name** for title and footer, **noise activity names** to exclude from "meaningful" usage, **score threshold** and **row limits**.
 4. **Run SQL** — Execute the metrics query, then the qualified-lead query, then the optional flagged query. Adapt SQL from the customer's own FunnelStory agent config when available; otherwise start from the templates in [reference.md](reference.md).

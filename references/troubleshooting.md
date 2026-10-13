@@ -42,7 +42,7 @@ Common problems and how Claude should handle them.
 
 **What to do:**
 - Set `limit` to at least 200 on account-list queries.
-- Process in batches if `get_account` is needed per account (batch size ~20).
+- Process in batches if per-account `query_semantic_db` calls are needed (batch size ~20).
 - Show progress: "Found 84 accounts. Processing in batches..."
 - If it exceeds ~200 accounts, ask: "You have a large portfolio. Want me to focus on a specific segment (e.g. at-risk, renewing soon, top ARR)?"
 

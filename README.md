@@ -18,18 +18,27 @@ Everything requires the FunnelStory MCP so the agent can query your Customer Int
 | Folder | What it’s for |
 | --- | --- |
 | `account-brief/` | Single-account summary / health deep-dive (internal) |
+| `account-support-history/` | Latest tickets, open escalations, support history for a named account |
+| `health-score-breakdown/` | Why a named account’s health score is what it is — factors, weights, trend |
+| `success-plan/` | Forward-looking gap analysis + 30/60/90-day action plan for a named account |
 | `book-of-business/` | “My book” — assigned accounts / portfolio snapshot |
 | `meeting-prep/` | Pre-call brief for a named account |
-| `qbr-deck/` | Quarterly Business Review deck (e.g. PowerPoint) |
+| `qbr-internal/` | Internal QBR deck — risks, honest metrics, team prep (PowerPoint) |
+| `qbr-external/` | Customer-facing QBR deck — value delivered, no internal scores |
+| `qbr-deck/` | Quarterly Business Review deck (e.g. PowerPoint) — not routed from `SKILL.md`; see `qbr-internal/` and `qbr-external/` |
 | `case-study/` | Publishable styled HTML case study |
 | `lead-reports/` | Hot leads, PQL, trial conversion (see `reference.md` too) |
 | `expansion-dashboard/` | Land-and-expand: seats, users, sites, geography |
 | `upsell-dashboard/` | Higher tier, premium modules, add-on SKUs |
 | `churn-risk-report/` | At-risk accounts, retention drivers |
+| `renewal-dashboard/` | Renewals in the next 90 days, ranked by churn likelihood |
 | `adoption-gap/` | Low usage vs entitlements / shelfware |
 | `value-email/` | Customer-facing ROI / value recap email |
 | `exec-sponsor/` | Executive sponsor coverage and gaps |
-| `flow-authoring/` | Workflow / automation design |
+| `feature-requests/` | What customers are asking for, ranked by frequency and ARR |
+| `adoption-funnel/` | Feature-level adoption across the customer base (PM-facing) |
+| `customer-roi-stories/` | Batch of compact, metric-backed ROI snippets for marketing |
+| `flow-authoring/` | Workflow / automation design — placeholder, not routed from `SKILL.md` |
 | `connection-queries/` | Connection query syntax (SQL, SOQL, HubSpot, Attio blocks) |
 | `configure-data-model/` | Data model configuration via MCP (mappings, joins, preview, save) |
 
