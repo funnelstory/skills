@@ -14,25 +14,25 @@
 ## Step 2 — Risk signals (combine as available)
 
 - `prediction` / `prediction_score` / health model outputs.
-- `health_score` below threshold.
-- **Negative** needle movers (`impact`, labels: competitor, pricing, personnel_change).
+- `health_score` tier per **Health tiers** in the root `SKILL.md` (Critical ≤ 45, At risk 46–54, On track ≥ 55). No score is Unscored.
+- **Negative** needle movers (`source IN ('v2', 'relationship_map')`, labels such as competitor, pricing, personnel_change, relationship_drop). Report the impact tier, not the raw integer.
 - **Sentiment:** conversation or support sentiment sustained negative.
 - **Engagement collapse:** activity drop vs prior period.
-- **Open critical tickets** or escalations.
+- **Open critical tickets** or escalations — via `references/linking-conversations-to-accounts.md`.
 - **Notes** mentioning churn, competitor, or executive dissatisfaction (if `notes` queryable).
 
 Convert prediction scores to 0–100 for display if the workspace uses -1..1: `(score * 50) + 50` (document if used).
 
 ## Step 3 — Query pattern
 
-- Pull accounts with renewal dates and scores.
-- Join or post-filter `needle_movers` with `INSTR(account_ids, account_id) > 0` (the `account_ids` field is text-based, not a JSON array).
+- Pull accounts with renewal dates and scores. Exclude `churned` unless the user asks for them. Value is `aggregate_amount`.
+- Join or post-filter `needle_movers` with `INSTR(account_ids, account_id) > 0` (the `account_ids` field is text-based, not a JSON array) and `source IN ('v2', 'relationship_map')`.
 
 ## Step 4 — Report structure
 
-**Executive summary (3–5 bullets):** ARR at risk (if amount known), count of critical accounts, themes.
+**Executive summary (3–5 bullets):** value at risk (sum of `aggregate_amount`), count of Critical accounts, themes.
 
-**Ranked table or cards:** Account, risk tier (Critical / High / Medium), top 3 drivers (data-cited), renewal date, **recommended next action** + owner suggestion.
+**Ranked table or cards:** Account, health tier (Critical / At risk / On track / Unscored), top 3 drivers (data-cited), renewal date, **recommended next action** + owner suggestion.
 
 **Optional:** "New this week" section if comparing snapshots (user must provide or you note "single snapshot").
 

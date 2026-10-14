@@ -19,14 +19,15 @@ Ask or infer:
 
 ```sql
 SELECT
-  account_id, name, domain, amount, health_score, prediction_score,
-  expires_at, feature_adoption, activity_score, support_sentiment,
-  conversation_sentiment, license_utilization
+  account_id, name, domain, aggregate_amount, health_score,
+  earliest_child_expiry, expires_at, feature_adoption, product_engagement,
+  activity_score, support_sentiment, conversation_sentiment, license_utilization
 FROM accounts
-WHERE expires_at IS NOT NULL
-  AND expires_at >= datetime('now')
-  AND expires_at <= datetime('now', '+90 days')
-ORDER BY expires_at ASC
+WHERE (churned = 0 OR churned IS NULL)
+  AND COALESCE(earliest_child_expiry, expires_at) IS NOT NULL
+  AND COALESCE(earliest_child_expiry, expires_at) >= datetime('now')
+  AND COALESCE(earliest_child_expiry, expires_at) <= datetime('now', '+90 days')
+ORDER BY COALESCE(earliest_child_expiry, expires_at) ASC
 ```
 
 Adjust the `+90 days` window based on user input.
@@ -47,45 +48,46 @@ AND (json_extract(properties, '$.csm_email') = '<user_email>'
 
 For each renewing account, also pull:
 
-- **Open negative needle movers** (impact < 0, state = 'open')
-- **Recent support sentiment** from tickets
+- **Open negative needle movers** — `state = 'open'`, `source IN ('v2', 'relationship_map')`, impact below 0. Report the product impact tier from the root `SKILL.md`, not the raw integer.
+- **Recent support sentiment and open escalations** — via `references/linking-conversations-to-accounts.md` (no fixed ticket join)
 - **Activity trend** (current 90 days vs prior 90 days — is engagement rising or falling?)
 - **Notes** mentioning "renewal", "churn", "competitor", or "pricing" in the last 90 days
 
 ## Step 3 — Classify renewal risk
 
-For each account, assign a tier:
+Band each account using **Health tiers** in the root `SKILL.md`:
 
-| Tier | Criteria |
-|------|----------|
-| **Critical** | Health < 50, OR prediction = churn, OR multiple negative needle movers |
-| **At risk** | Health 50–69, OR declining activity trend, OR negative sentiment |
-| **On track** | Health 70+, stable/growing engagement, no open risks |
+| Tier | Health score |
+|------|----------------|
+| **Critical** | 45 or below |
+| **At risk** | 46 to 54 |
+| **On track** | 55 or above |
 
-Document the logic used in a "Method" footnote on the dashboard.
+No score is **Unscored**. List the other signals (negative needle movers, prediction, activity trend, sentiment) as drivers beside the tier. Do not change the tier because of them. If the workspace profile names different thresholds, use those and say so in a "Method" footnote.
 
 ## Step 4 — Output
 
 ### KPI row
 - Total accounts renewing
-- Total ARR renewing (sum of `amount`)
-- Critical count + ARR
-- At-risk count + ARR
+- Total contract value renewing (sum of `aggregate_amount`, labelled per the workspace profile)
+- Critical count + value
+- At risk count + value
+- On track count + value
 
-### Per-account cards (sorted: Critical first, then At risk, then On track)
+### Per-account cards (sorted: Critical first, then At risk, then On track, then Unscored)
 
 Each card:
 - Account name (linked to FunnelStory if possible)
-- ARR, renewal date, days remaining
-- Risk tier badge (Critical / At risk / On track)
+- Contract value, renewal date, days remaining
+- Tier badge (Critical / At risk / On track / Unscored)
 - Top 2 risk drivers (cited from data)
-- **Suggested action** — one concrete pre-renewal step (e.g., "Schedule exec sponsor call", "Run value recap email", "Address open ticket #X")
+- **Suggested action** — one concrete pre-renewal step (e.g., "Schedule exec sponsor call", "Run value recap email", "Address the open escalation")
 
 ### Summary section
 
-- Accounts needing immediate attention (Critical tier)
-- Themes across at-risk renewals (common drivers)
-- Coverage check: any critical renewals without a recent CSM touch?
+- Accounts needing immediate attention (Critical)
+- Themes across At risk renewals (common drivers)
+- Coverage check: any Critical renewals without a recent CSM touch?
 
 ## Quality bar
 

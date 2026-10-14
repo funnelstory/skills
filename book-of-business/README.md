@@ -15,13 +15,15 @@ If accounts were not yet resolved, try these strategies in order until one retur
 Use the `assignees` JSON array on the `accounts` table:
 
 ```sql
-SELECT account_id, name, domain, amount, health_score, prediction_score,
-       expires_at, feature_adoption, activity_score, support_sentiment,
-       conversation_sentiment, license_utilization, total_users, assignees
+SELECT account_id, name, domain, aggregate_amount, health_score,
+       earliest_child_expiry, feature_adoption, product_engagement,
+       activity_score, support_sentiment, conversation_sentiment,
+       license_utilization, total_users, assignees, parent_account_id
 FROM accounts
-WHERE EXISTS (
-  SELECT 1 FROM json_each(assignees) WHERE json_each.value = '<user_email>'
-)
+WHERE (churned = 0 OR churned IS NULL)
+  AND EXISTS (
+    SELECT 1 FROM json_each(assignees) WHERE json_each.value = '<user_email>'
+  )
 ORDER BY health_score ASC
 ```
 
@@ -30,13 +32,15 @@ ORDER BY health_score ASC
 If Strategy A returns no results (the workspace may store ownership in account properties instead):
 
 ```sql
-SELECT account_id, name, domain, amount, health_score, prediction_score,
-       expires_at, feature_adoption, activity_score, support_sentiment,
-       conversation_sentiment, license_utilization, total_users
+SELECT account_id, name, domain, aggregate_amount, health_score,
+       earliest_child_expiry, feature_adoption, product_engagement,
+       activity_score, support_sentiment, conversation_sentiment,
+       license_utilization, total_users, parent_account_id
 FROM accounts
-WHERE json_extract(properties, '$.csm_email') = '<user_email>'
+WHERE (churned = 0 OR churned IS NULL)
+  AND (json_extract(properties, '$.csm_email') = '<user_email>'
    OR json_extract(properties, '$.account_owner') = '<user_email>'
-   OR json_extract(properties, '$.csm') = '<user_email>'
+   OR json_extract(properties, '$.csm') = '<user_email>')
 ORDER BY health_score ASC
 ```
 
@@ -73,7 +77,8 @@ If the `notes` table is unavailable, skip — note it in the output footer.
 SELECT nm.title, nm.description, nm.state, nm.impact, nm.label, nm.account_ids,
        nm.assigned_to_email, nm.updated_at
 FROM needle_movers nm
-WHERE nm.state IN ('open', 'acknowledged')
+WHERE nm.state = 'open'
+  AND nm.source IN ('v2', 'relationship_map')
 ORDER BY ABS(nm.impact) DESC
 LIMIT 50
 ```
@@ -84,13 +89,15 @@ Filter post-query: keep only needle movers whose `account_ids` contains any of t
 
 ## Step 3 — Classify Each Account
 
-Assign a risk tier based on available signals:
+Band each account using **Health tiers** in the root `SKILL.md`:
 
-| Tier | Criteria |
-|------|----------|
-| **Critical** | Health < 50, OR prediction outcome = churn, OR multiple open negative needle movers |
-| **At risk** | Health 50–69, OR declining activity/adoption, OR negative sentiment, OR renewal within 60 days with unresolved risks |
-| **On track** | Health 70+, stable or growing engagement, no open critical risks |
+| Tier | Health score |
+|------|----------------|
+| **Critical** | 45 or below |
+| **At risk** | 46 to 54 |
+| **On track** | 55 or above |
+
+No score is **Unscored**, not a tier. Report other signals (prediction outcome, negative needle movers, declining activity or adoption, negative sentiment, renewal within 60 days) as drivers beside the tier. Do not change the tier because of them. Value on a card is `aggregate_amount`. Renewal date is `earliest_child_expiry` when set, otherwise `expires_at`. `product_engagement` is 0–3 (inactive, monthly, weekly, daily), not a percentage.
 
 ---
 
@@ -103,19 +110,20 @@ Output as a **self-contained HTML file** using the layout from `templates/html-d
 | Box | Value |
 |-----|-------|
 | Accounts | Total count in book |
-| Total ARR | Sum of `amount`, formatted as `$X.XXM` or `$XXK` |
-| Critical accounts | Count + ARR subtotal (use `--danger` color) |
-| On track | Count + ARR subtotal (use `--success` color) |
+| Total value | Sum of `aggregate_amount`, labelled per the workspace profile, formatted as `$X.XXM` or `$XXK` |
+| Critical | Count + value subtotal (use `--danger` color) |
+| At risk | Count + value subtotal (use `--warning` color) |
+| On track | Count + value subtotal (use `--success` color) |
 
 ### Filter buttons
 
-Row of toggle buttons below the KPI row: **All ({count})** · **Critical ({count})** · **At risk ({count})** · **On track ({count})**
+Row of toggle buttons below the KPI row: **All ({count})** · **Critical ({count})** · **At risk ({count})** · **On track ({count})** · **Unscored ({count})**
 
-Implement as JavaScript click handlers that show/hide cards by `data-tier` attribute.
+Implement as JavaScript click handlers that show/hide cards by `data-tier` (`critical` / `at_risk` / `on_track` / `unscored`).
 
 ### Account cards
 
-Two-column grid (single column on mobile). Sorted: Critical first, then At risk, then On track. Within each tier, sort by `expires_at` ascending (soonest renewal first).
+Two-column grid (single column on mobile). Sorted: Critical first, then At risk, then On track, then Unscored. Within each tier, sort by renewal date ascending (soonest first).
 
 Each card:
 
@@ -136,9 +144,9 @@ Each card:
 ```
 
 **Card rules:**
-- **Tier badge:** Colored pill in the top-right. Critical = `--danger`, At risk = `--warning`, On track = `--success`.
+- **Tier badge:** Colored pill in the top-right. Critical = `--danger`, At risk = `--warning`, On track = `--success`. Unscored has no color.
 - **Metrics line:** Health score (0–100), Adoption (feature_adoption × 100, as %), Days to renewal.
-- **Bullet points:** 2 data-grounded insights. For Critical/At risk: cite the specific risks. For On track: cite strengths and any areas to watch.
+- **Bullet points:** 2 data-grounded insights. For Critical and At risk: cite the specific risks. For On track: cite strengths and any areas to watch.
 - **Suggested action:** One concrete next step in a highlighted box. Examples: "Schedule executive sponsor call — renewal in 12 days", "Send value recap email — health strong but sentiment declining", "Address open ticket on data export — blocking expansion."
 - **Prediction score display:** Convert -1→1 to 0–100 via `(score * 50) + 50` if needed.
 - **Feature adoption:** Display as percentage (value × 100 if stored as 0–1).
@@ -198,7 +206,7 @@ After viewing the dashboard, the user may ask about a specific account by name. 
 - **Audience:** CSM scanning their portfolio. Keep it tight.
 - **No raw IDs** — use account names everywhere.
 - **No fabricated data** — if a section has no data, say "No data available" and move on.
-- **Health display** — integer 0–100 scale.
+- **Health display** — integer 0–100, tiered per **Health tiers** in the root `SKILL.md`.
 - **ARR display** — format with `$` and comma thousands (e.g. `$93,760`) or abbreviated (e.g. `$43K`).
 - **Dates** — `Mon DD` on cards, full `Mon DD, YYYY` in drill-downs. Include days remaining for renewals.
 - **Missing data** — if notes, needle movers, or tickets aren't queryable, skip those signals and note it in the footer. Strengthen card insights using available account-level data.

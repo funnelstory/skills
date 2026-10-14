@@ -15,7 +15,7 @@ Confirm:
 
 ## Step 2 — Signals (configure per tenant)
 
-Typical signals (use only what exists in schema):
+Typical signals (use only what exists in schema). Value in any total is `aggregate_amount`. Do not treat `product_engagement` as a percentage (it is 0–3).
 
 - **Plan vs usage mismatch:** high usage on base tier → eligible for premium.
 - **Feature gates:** heavy use of activity X while `properties` shows module Y not enabled.

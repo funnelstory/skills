@@ -7,13 +7,16 @@
 
 ## Step 1 — Schema discovery
 
-Executive sponsor data **varies by workspace**. Check:
+Read `file://semantic/account_profiles.md` and `file://semantic/relationship_map_history.md` before querying.
 
+Executive sponsor data **varies by workspace**. Check, in order:
+
+- Contact cards in `account_profiles` whose `role` is `Executive Sponsor`.
+- Open needle movers with `label` `relationship_drop` or `single_threaded_relationship` (`source = 'relationship_map'`).
 - `json_extract(properties, '$.executive_sponsor')` or similar keys (`sponsor_email`, `exec_sponsor`, `vp_sponsor`).
-- `meetings` joined via `meeting_contacts` → `contacts` → account domain: filter by title containing "VP", "Director", "Chief", or participant email domain = customer exec (tune per tenant).
-- `tasks` or `needle_movers` labeled as executive action items (if used).
+- Last executive-level touch from `relationship_map_history` participants, then from `meetings`.
 
-If no sponsor field exists, **derive** "last exec-level meeting" from meeting participants/titles and flag accounts with **no qualifying meeting in N days**.
+If no sponsor field exists, **derive** "last exec-level meeting" from meeting participants and titles and flag accounts with **no qualifying meeting in N days**. Label inferred rows "Inferred from meetings" versus "From profile" or "From CRM field".
 
 State assumptions explicitly in the output.
 

@@ -12,7 +12,8 @@ Configure FunnelStory data models via MCP tools: pick model type, map columns, a
 - **`query_semantic_db`** — find source connections (`SELECT id, type, name FROM data_connections`) and inspect existing models (`data_models`). It takes raw SQL; no connection ID is needed.
 - **`get_data_connection_schema`** and **`preview_data_connection`** — validate queries (via connection-queries workflow).
 - **`preview_data_model`** — test the full config without saving.
-- **`configure_data_model`** — create or update a saved model.
+- **`configure_data_model`** — create a model, or replace one wholesale. Omit `id` to create; pass `id` to replace.
+- **`edit_data_model`** — change one part of an existing model and leave the rest. Read `file://data_model/guide.md` before either write.
 
 ## Step 1 — Clarify and inspect
 
@@ -39,12 +40,14 @@ connection-queries/  →  preview_data_connection
         ↓
 preview_data_model     ← full config including mappings and joins
         ↓
-configure_data_model   ← save (pass id to update)
+edit_data_model        ← partial change to an existing model
+configure_data_model   ← create, or replace the whole model (pass id to replace)
 ```
 
 - **`preview_data_connection`** — test a single query against one connection (up to 25 rows).
 - **`preview_data_model`** — test the full model payload (primary `data_source`, `mappings`, optional `joins`) without saving.
-- **`configure_data_model`** — create or update. Omit `id` to create; pass `id` to update.
+- **`configure_data_model`** — create, or replace the whole model. Omit `id` to create; pass `id` to replace. Any section you omit is not merged onto the stored model.
+- **`edit_data_model`** — change one part of an existing model and leave the rest.
 
 Always preview before configure.
 

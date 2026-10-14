@@ -1,33 +1,34 @@
-# Flow Authoring Guide
+# Flow authoring
 
-## Overview
+Create or change a FunnelStory flow (an agent or workflow). The server already ships the guides. Read them. Do not reconstruct a flow from memory or from this file.
 
-<!-- Describe what "flow" means in your context (e.g., automation flows, process flows, UI flows) and the main goals of flow authoring. -->
+## When to use this
 
-## When to Use This Sub-Skill
+The user wants to create, edit, run, or debug a flow. A question about an account's data is not this skill.
 
-<!-- List trigger scenarios: when should the agent apply this guide? -->
+## Before any JSON
 
-## Core Concepts
+Call `read_resource` on these, in order:
 
-<!-- Define key concepts: nodes, edges, triggers, conditions, actions, etc. -->
+1. `file://workspace/profile.json` — terminology and what must not be surfaced. Required when an AGENT step writes customer-facing copy.
+2. `file://flow/guide.md` — the entry point. Follow it.
 
-## Authoring Steps
+Then only the ones the flow needs:
 
-<!-- Step-by-step workflow for creating or editing a flow. -->
+- `file://flow/ops.md` — step operation types
+- `file://flow/functions.md` — CALL functions
+- `file://flow/patterns.md` — which shape fits
+- `file://flow/pptx.md` — the flow uses `pptx.create`. Also call `list_templates` and `read_template`.
+- `file://flow/pdf.md` — the flow uses `pdf.create`
+- `file://flow/outcome_agent.md` — the flow is an outcome program
 
-1. 
-2. 
-3. 
+## Tools
 
-## Conventions and Best Practices
+- `get_flows` — list flows, or fetch one by `flow_id`
+- `save_flow` — create a flow, or replace one wholesale. Omitting a field on a replace clears it. Do not use this to change one step.
+- `edit_flow` — every targeted change after the flow exists
+- `preview_flow_triggers` — who a trigger would select
+- `run_flow` — run it
+- `debug_flow_step` — run one step
 
-<!-- Naming, structure, error handling, documentation. -->
-
-## Examples
-
-<!-- Optional: link to examples or add short examples here. -->
-
-## Additional Resources
-
-<!-- Links to reference docs, tools, or related skills. -->
+`file://flow/guide.md` owns the gates (validate SQL with `query_semantic_db` before save, draft versus published, chat flows storing `@.response`). Follow those gates. Do not invent a shorter path.

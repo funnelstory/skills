@@ -9,7 +9,9 @@ Identify gaps in a named account — both usage-based and qualitative (from note
 
 ## Step 1 — Identify the account
 
-If the user hasn't named an account, ask for it. Resolve via name search.
+If the user hasn't named an account, ask for it. Resolve it with **Resolving a named account** in the root `SKILL.md`.
+
+Creating the tasks in FunnelStory, after the plan is written, is `projects-and-tasks/`. This skill writes the plan.
 
 ## Step 2 — Gather gap signals
 
@@ -62,7 +64,8 @@ Scan notes and meeting summaries for:
 SELECT title, description, state, impact, label
 FROM needle_movers
 WHERE INSTR(account_ids, '<account_id>') > 0
-  AND state IN ('open', 'acknowledged')
+  AND state = 'open'
+  AND source IN ('v2', 'relationship_map')
 ORDER BY impact ASC
 ```
 
@@ -70,7 +73,7 @@ Open negative needle movers are direct inputs to the plan.
 
 ### Current health context
 
-Pull `health_score`, `prediction_score`, `expires_at`, `amount` from `accounts` to frame urgency.
+Pull `health_score` (tier per the root `SKILL.md`), `earliest_child_expiry` or `expires_at`, and `aggregate_amount` from `accounts` to frame urgency.
 
 ## Step 3 — Synthesize gaps into themes
 

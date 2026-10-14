@@ -36,8 +36,7 @@ LIMIT 25;
 Several matches is normal. Enterprise workspaces carry stale duplicates, and some carry
 one account **per site** — a parent plus nine site records is a real shape, not an error.
 
-Rank candidates by non-zero `amount`, presence of `assignees`, and recent activity
-volume. Pick the top one, **state which you picked and why in one line**, and offer the
+Rank candidates by non-zero `aggregate_amount` (fall back to `amount`), presence of `assignees`, and recent activity volume. Follow **Resolving a named account** in the root `SKILL.md`. Pick the top one, **state which you picked and why in one line**, and offer the
 alternatives at the end. Do not open with a disambiguation question — a user who typed
 five words should get an answer, not a quiz.
 
