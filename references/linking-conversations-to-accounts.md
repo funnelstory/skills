@@ -223,5 +223,8 @@ into their workspace profile `instructions` so later runs skip Steps 1–4. Pres
 text for them to apply; **this skill must never write to workspace-level configuration**,
 which is an admin action with side effects beyond the current user.
 
+Admins setting up a workspace can run `workspace-profile-setup/`, which runs this routine
+as one of its steps and records the findings alongside the rest of the profile.
+
 Re-run discovery and compare when the recorded coverage numbers no longer match what a
 spot-check returns — that is the signal a workspace has migrated systems.

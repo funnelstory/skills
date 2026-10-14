@@ -7,6 +7,41 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.3.0] — 2026-10-14
+
+Adds an admin-facing setup workflow for the workspace profile.
+
+### Added
+
+- **`workspace-profile-setup/`** — guides a workspace admin through drafting the workspace
+  profile that every sub-skill reads first. It measures the workspace with read-only
+  queries (populated tables, account structure, value fields, ownership and custom
+  properties, product metrics, health distribution, support linkage), asks only what the
+  data cannot answer, drafts the structured fields and a standard-format `instructions`
+  block, and tests the draft on three prompts before the admin applies it on Workspace
+  Grounding. Only `admin` and `super_admin` continue; anyone else is told to ask a workspace
+  admin. It never writes workspace configuration.
+- **Workspace admin / CS Ops** persona and trigger examples in `references/use-cases.md`.
+
+### Changed
+
+- **Health is product-defined.** Workspace profile `instructions` can no longer redirect
+  health to another index or change tier thresholds, so Claude and the FunnelStory UI always
+  agree. The profile can still restrict where health appears. Updated in the root
+  `SKILL.md`, `account-brief/`, and `renewal-dashboard/`.
+- Root `SKILL.md` routes profile setup and review requests, and the description includes
+  setup phrasing.
+- `references/linking-conversations-to-accounts.md` points admins to the new setup
+  workflow for recording support findings.
+
+### Upgrading
+
+- **Claude Code / Cursor (symlinked):** `git pull` in the skills directory.
+- **Claude Desktop / web:** re-download and re-add the **entire** skills directory, then
+  remove the previous version.
+
+---
+
 ## [1.2.0] — 2026-10-14
 
 Brings every sub-skill onto the product's health tiers and the current semantic database, and routes three workflows the MCP already supports.

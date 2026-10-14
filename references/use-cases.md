@@ -72,6 +72,16 @@ Trigger examples mapped to sub-skills. Use this to disambiguate intent when the 
 
 ---
 
+## Workspace admin / CS Ops
+
+| Trigger | Sub-skill | Output | Value |
+|---------|-----------|--------|-------|
+| "Set up our workspace profile" | `workspace-profile-setup/` | Values to apply on Workspace Grounding, after three test prompts | Every other skill uses your terminology and conventions |
+| "Our CSM field changed — update the profile" | `workspace-profile-setup/` | Edits to existing `instructions`, re-tested | Keeps skills accurate after data-model changes |
+| "Check whether our profile is still right" | `workspace-profile-setup/` | Findings vs current profile, with suggested edits | Catches drift after migrations or new sources |
+
+---
+
 ## Tips
 
 - **Specify audience** when asking for a QBR: "internal" vs "customer-facing" changes the entire output.
