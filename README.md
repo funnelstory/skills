@@ -18,20 +18,32 @@ Everything requires the FunnelStory MCP so the agent can query your Customer Int
 | Folder | What it’s for |
 | --- | --- |
 | `account-brief/` | Single-account summary / health deep-dive (internal) |
-| `book-of-business/` | “My book” — assigned accounts / portfolio snapshot |
+| `account-support-history/` | Latest tickets, open escalations, support history for one account |
+| `health-score-breakdown/` | Why the health score is what it is — factors, weights, what to fix |
+| `success-plan/` | Forward-looking action plan for one account |
 | `meeting-prep/` | Pre-call brief for a named account |
-| `qbr-deck/` | Quarterly Business Review deck (e.g. PowerPoint) |
+| `qbr-internal/` | Internal QBR prep deck (risks, honest metrics) — not for the customer |
+| `qbr-external/` | Customer-facing QBR focused on value delivered |
 | `case-study/` | Publishable styled HTML case study |
-| `lead-reports/` | Hot leads, PQL, trial conversion (see `reference.md` too) |
+| `value-email/` | Customer-facing ROI / value recap email |
+| `book-of-business/` | “My book” — assigned accounts / portfolio snapshot |
+| `prioritize-my-day/` | Today’s action cards, plus Critical and At risk accounts with no card |
+| `churn-risk-report/` | At-risk accounts, retention drivers |
+| `renewal-dashboard/` | Renewals in the next N days, ranked by risk, with pre-renewal actions |
 | `expansion-dashboard/` | Land-and-expand: seats, users, sites, geography |
 | `upsell-dashboard/` | Higher tier, premium modules, add-on SKUs |
-| `churn-risk-report/` | At-risk accounts, retention drivers |
 | `adoption-gap/` | Low usage vs entitlements / shelfware |
-| `value-email/` | Customer-facing ROI / value recap email |
 | `exec-sponsor/` | Executive sponsor coverage and gaps |
-| `flow-authoring/` | Workflow / automation design |
+| `lead-reports/` | Hot leads, PQL, trial conversion (see `reference.md` too) |
+| `feature-requests/` | What customers are asking for, ranked across accounts (PM) |
+| `adoption-funnel/` | Feature-level adoption across the customer base (PM) |
+| `customer-roi-stories/` | Batch ROI snippets across accounts (marketing) |
 | `connection-queries/` | Connection query syntax (SQL, SOQL, HubSpot, Attio blocks) |
 | `configure-data-model/` | Data model configuration via MCP (mappings, joins, preview, save) |
+| `flow-authoring/` | Create or edit a flow; reads the MCP flow guides |
+| `projects-and-tasks/` | Create a project or task, or add a note to a task |
+
+Shared material: `templates/` (HTML dashboard and one-pager layouts) and `references/` (support-data linkage, troubleshooting, persona use cases). Conventions that every sub-skill follows — account resolution, health tiers, value and renewal, needle movers, support data, missing data, output files — live in the **Shared conventions** section of the root `SKILL.md`.
 
 ## Usage
 
@@ -63,9 +75,11 @@ More on Claude Code skills: [docs.anthropic.com](https://docs.anthropic.com/en/d
 ## Contributing
 
 1. Prefer **new workflows** as a new sub-folder with a clear **`README.md`** (steps, SQL patterns, output expectations).
-2. Update root **`SKILL.md`**: add a row to the routing table and extend the `description` if new triggers are needed.
-3. Use YAML frontmatter on root `SKILL.md` with at least `name` and `description`.
-4. Open a PR. Keep one concern per sub-folder.
+2. Update root **`SKILL.md`**: add a row to the routing table and extend the `description` if new triggers are needed. Follow its **Shared conventions** rather than restating or overriding them.
+3. Keep examples generic. This is a public repository — no customer names, workspace-specific field names, real emails, or data samples from a real workspace.
+4. Use YAML frontmatter on root `SKILL.md` with at least `name` and `description`, and bump `version`.
+5. Add a `CHANGELOG.md` entry.
+6. Open a PR. Keep one concern per sub-folder.
 
 For the general skill format, see [How to create custom skills](https://support.claude.com/en/articles/12512198-creating-custom-skills) and [Anthropic's template](https://github.com/anthropics/skills/tree/main/template).
 

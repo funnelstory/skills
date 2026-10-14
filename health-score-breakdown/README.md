@@ -18,7 +18,7 @@ WHERE name LIKE '%AccountName%'
 LIMIT 10
 ```
 
-Confirm with the user if multiple matches.
+If several match, follow **Resolving a named account** in the root `SKILL.md`. Report the tier per **Health tiers** alongside the score. `health_score` is the displayed prediction health score (`50 + trunc(prediction_score * 100 / 2)`), not a blend of the other metric columns.
 
 ## Step 2 — Gather health components
 
@@ -32,7 +32,7 @@ FROM accounts
 WHERE account_id = '<account_id>'
 ```
 
-Each field is a component that contributes to the composite `health_score`. Not all workspaces populate every field — skip any that return NULL and note it.
+`health_score` is the displayed prediction health score. The other columns are separate signals — report them as context, not as weights inside `health_score`. Factor detail for this account is in `prediction_account_history.point`. Use `prediction_model_factors` only when explaining why a score changed; it is expensive to query.
 
 ### Prediction factors
 

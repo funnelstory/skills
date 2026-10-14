@@ -28,7 +28,7 @@ Combine signals such as:
 - **Health:** not in free trial; `health_score` or prediction not "churn" (exclude obvious churn plays — those belong in churn report).
 - **Renewal timing:** optional boost for accounts 6–18 months from renewal (expansion before renewal).
 
-Document the rule you used in a short "Method" line on the dashboard.
+Value in any total is `aggregate_amount`. `product_engagement` is 0–3 (inactive, monthly, weekly, daily), not a percentage. Keep this skill's own opportunity criteria; do not reband accounts onto health tiers.
 
 ## Step 3 — Query pattern (illustrative)
 
@@ -40,10 +40,11 @@ SELECT
   a.account_id,
   a.name,
   a.domain,
-  a.amount,
+  a.aggregate_amount,
   a.health_score,
-  a.expires_at,
-  a.total_users
+  a.earliest_child_expiry,
+  a.total_users,
+  a.product_engagement
 FROM accounts a
 WHERE a.churned = 0 OR a.churned IS NULL
 ORDER BY a.health_score DESC

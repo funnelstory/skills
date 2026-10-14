@@ -17,7 +17,8 @@ Ask or infer:
 
 Use what exists:
 
-- `accounts`: `license_utilization`, `feature_adoption`, `total_users`, `properties` JSON.
+- `accounts`: `license_utilization`, `feature_adoption`, `total_users`, `aggregate_amount`, `properties` JSON.
+- `product_engagement` is 0–3 (inactive, monthly, weekly, daily), not a percentage.
 - `activities`: counts by `activity_name`, `last_seen`, distinct active days.
 - `users`: active vs total per account (if modeled).
 

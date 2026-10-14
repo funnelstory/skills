@@ -1,14 +1,18 @@
 ---
 name: funnelstory
-version: 1.1.0
+version: 1.2.0
 description: >
   FunnelStory MCP toolkit for Customer Success, Product, and Marketing teams. Use this skill
-  for ANY request involving FunnelStory data: account briefs, book of business, meeting prep,
-  support history and open tickets for an account, QBR decks (internal or customer-facing),
-  case studies, lead/PQL reports, expansion dashboards, upsell dashboards, churn risk reports,
-  renewal dashboards, adoption gap analysis, adoption funnels, health score breakdowns,
-  success plans, value emails, executive sponsor tracking, feature request dashboards,
-  customer ROI stories, data model configuration, or connection query authoring.
+  whenever a request needs customer or account data, even if FunnelStory is not named:
+  "prep me for my call with <account>", "tell me about <account>", "how's my book",
+  "what should I do today", "who's renewing next quarter", "which accounts might churn",
+  "what's open with <account>", "build a QBR for <account>", "draft a value email",
+  "create a flow", "add a task". Covers account briefs, book of business, a daily priority
+  list, meeting prep, support history, QBR decks (internal or customer-facing), case studies,
+  lead/PQL reports, expansion and upsell dashboards, churn risk reports, renewal dashboards,
+  adoption gap analysis, adoption funnels, health score breakdowns, success plans, value
+  emails, executive sponsor tracking, feature request dashboards, customer ROI stories,
+  projects and tasks, flow authoring, data model configuration, and connection query authoring.
   Requires FunnelStory MCP to be connected.
 ---
 
@@ -21,7 +25,7 @@ For persona-specific trigger examples, see `references/use-cases.md`.
 
 ## Prerequisites
 - **Read context resources first (always).** Before doing any work on a request — querying data, routing to a sub-skill, or producing a deliverable — call the **`read_resource`** tool with the relevant resource URI(s) to load the current context for the task. The MCP server exposes reference context (schema, field definitions, workspace configuration, and similar) addressable by URI. Identify which resource(s) the request depends on, read them with `read_resource`, and only then proceed. Do not rely on assumed schema, field names, or prior-session memory when a resource can confirm the current state — read first, then act.
-- **FunnelStory MCP** must be connected (login via OTP if required).
+- **FunnelStory MCP** must be connected. Authentication is OAuth 2.0 with PKCE; see `MCP_DOCUMENTATION.md`. Do not start an OTP login unless `who_am_i` fails and the connected server exposes a `login` tool.
 - **Read `file://workspace/profile.json` before querying.** Its `instructions` field may override metric names, health conventions, or which fields may be surfaced. Workspace instructions take precedence over the defaults in any sub-skill README.
 - Use **`query_semantic_db`** to run SQLite against the semantic database. It takes raw SQL directly; no connection lookup is required. Set limits high enough to avoid truncation (e.g. 25+ rows).
 - Before writing queries, read `file://semantic/usage.md` and `file://semantic/schema.sql` via **`read_resource`**. Table and column availability differ between workspaces; confirm with `SELECT name FROM pragma_table_info('<table>')` when in doubt.
@@ -35,34 +39,106 @@ Many sub-skills need to know *whose* accounts to query. **Before doing anything 
 
 **If the request is portfolio-scoped** (book of business, churn risk across "my accounts", expansion on "my book", renewal pipeline, etc.):
 
-1. Ask: *"What email address are you logged in with in FunnelStory? I need it to find the accounts assigned to you."*
+1. Call **`who_am_i`** (FunnelStory MCP). It returns the connected user's id, name, email, and role — use that email. Only if `who_am_i` is unavailable or returns no email, ask: *"What email address are you logged in with in FunnelStory? I need it to find the accounts assigned to you."*
 2. Look up assigned accounts. Try these approaches in order until one returns results:
 
 **Primary — assignees column:**
 ```sql
-SELECT account_id, name, domain, amount, health_score, prediction_score, expires_at
+SELECT account_id, name, domain, aggregate_amount, health_score, earliest_child_expiry, parent_account_id
 FROM accounts
-WHERE EXISTS (
-  SELECT 1 FROM json_each(assignees) WHERE json_each.value = '<user_email>'
-)
+WHERE (churned = 0 OR churned IS NULL)
+  AND EXISTS (
+    SELECT 1 FROM json_each(assignees) WHERE json_each.value = '<user_email>'
+  )
 ```
 
 **Fallback — account properties:**
 ```sql
-SELECT account_id, name, domain, amount, health_score, prediction_score, expires_at
+SELECT account_id, name, domain, aggregate_amount, health_score, earliest_child_expiry, parent_account_id
 FROM accounts
-WHERE json_extract(properties, '$.csm_email') = '<user_email>'
+WHERE (churned = 0 OR churned IS NULL)
+  AND (json_extract(properties, '$.csm_email') = '<user_email>'
    OR json_extract(properties, '$.account_owner') = '<user_email>'
-   OR json_extract(properties, '$.csm') = '<user_email>'
+   OR json_extract(properties, '$.csm') = '<user_email>')
 ```
 
-If both return no results, ask the user to list account names manually (see book-of-business README for the full fallback chain).
+If both return no results, ask the user to list account names manually (see book-of-business README for the full fallback chain). If the workspace profile `instructions` name a different ownership field, use it first.
 
-3. Cache the email for the session — only ask once.
+3. Cache the identity for the session — resolve it only once.
 
-**If the request names a specific account** (account brief, meeting prep, QBR, case study, value email, health score breakdown, success plan, support history): skip this step and resolve the account by name in the sub-skill.
+**If the request names a specific account** (account brief, meeting prep, QBR, case study, value email, health score breakdown, success plan, support history): skip this step and resolve the account using the shared rule below.
 
 **If the request is workspace-wide** (feature requests dashboard, adoption funnel — typically PM/PMM personas): skip this step; query all accounts.
+
+## Shared conventions (all sub-skills)
+
+These apply to every sub-skill. A sub-skill README may add detail but should not contradict them; workspace profile `instructions` override both.
+
+### Resolving a named account
+
+Match on name **and** domain (`name LIKE '%X%' OR domain LIKE '%X%'`, limit 25). Several matches is normal — workspaces carry stale duplicates and sometimes one record per site, and sites often share a domain.
+
+- Rank candidates by non-zero `aggregate_amount` (fall back to `amount`), presence of `assignees`, and recent activity.
+- Proceed with the top candidate, state in one line which one you chose and why, and list the alternatives at the end so the user can redirect.
+- **Ask first only** when a parent and its children both match, or when the deliverable is customer-facing and more than one plausible match exists.
+- A parent has `parent_account_id` NULL and children pointing at it. For a parent, report `aggregate_amount` and `earliest_child_expiry`, and say so. `amount` and `expires_at` are the account's own values and are often empty on a parent.
+
+### Health tiers
+
+`health_score` is the score Focus Areas shows. It is already 0–100: `50 + trunc(prediction_score * 100 / 2)`. Band it the same way:
+
+| Tier | Health score |
+|------|----------------|
+| **Critical** | 45 or below |
+| **At risk** | 46 to 54 |
+| **On track** | 55 or above |
+
+- No score means no tier. Say **Unscored**.
+- The tier comes from the score alone. Report other signals (negative needle movers, an overdue renewal, prediction outcome `churn`, a weak relationship) as **drivers** next to the tier. Do not change the tier because of them.
+- If the workspace profile names a different health index or thresholds, use those and say so.
+
+### Value and renewal
+
+- Portfolio totals use `aggregate_amount`. Label it the way the workspace profile does (often ARR).
+- Renewal timing uses `earliest_child_expiry` when it is set, otherwise `expires_at`.
+- Portfolio skills exclude `churned` accounts unless the user asks for them.
+
+### Needle movers
+
+Match the product list: `source IN ('v2', 'relationship_map')` and `state = 'open'` unless the user asks for closed items. Include `content_theme` only when the user asks about themes. Report impact as a tier, never the raw integer:
+
+| Tier | Integer `impact` |
+|------|------------------|
+| **Negative high** | −7 or below |
+| **Negative medium** | below −2 and above −7 |
+| **Negative low** | −2 through just under 0 |
+| **Positive low** | above 0 through 2 |
+| **Positive medium** | above 2 and below 7 |
+| **Positive high** | 7 or above |
+
+### Where to read first
+
+Column rules live in `file://semantic/usage.md`. Also read, when the question needs them:
+
+- `file://semantic/account_profiles.md` — account narrative and stakeholders
+- `file://semantic/relationship_map_history.md` — who talked to whom
+- `file://data_model/guide.md` — data model configuration
+- `file://flow/guide.md` — flow authoring
+- `file://projects/guide.md` — projects and tasks
+
+Themes are `content_labels`, not `topics`. Upcoming invites are `calendar_events` joined through `calendar_event_accounts`. `meetings` are recorded calls. `product_engagement` is 0 (inactive), 1 (monthly), 2 (weekly), or 3 (daily). "What should I do" starts from `action_cards`: a NULL `status` is still a suggestion.
+
+### Support data
+
+Any per-account ticket, escalation, or conversation data goes through `references/linking-conversations-to-accounts.md`. Do not use a fixed `tickets` ↔ `ticket_contacts` ↔ `contacts.domain` join without its preconditions. Internal conversations (colleagues discussing a customer) never appear in customer-facing output.
+
+### Missing data
+
+Distinguish **"No data available"** (the source exists, nothing for this account) from **"Not available in this workspace"** (the workspace does not carry it). Never omit a section silently.
+
+### Output files
+
+Use the client's own document capabilities rather than hard-coded paths. In Claude, use the built-in pptx / docx / pdf skills and present the file to the user; in other clients, write the file to the workspace and report its path. Name files `<account-name>-<deliverable>.<ext>`.
 
 ## Step 1 — Route to the right sub-skill
 
@@ -94,6 +170,7 @@ Match the user's intent to **exactly one** sub-folder. Read the `README.md` insi
 | Adoption gap, low usage, shelfware, entitlement vs usage | `adoption-gap/` | Which accounts under-use (CSM-facing) |
 | Executive sponsor coverage, sponsor gaps | `exec-sponsor/` | Coverage audit |
 | Hot leads, PQL, trial conversion, net-new leads | `lead-reports/` | Also read `lead-reports/reference.md` |
+| What should I do today, prioritize my book | `prioritize-my-day/` | Open action cards first, then uncovered Critical / At risk and near renewals |
 
 ### PM / VP of Product
 
@@ -116,6 +193,13 @@ Match the user's intent to **exactly one** sub-folder. Read the `README.md` insi
 | Write or validate a connection query (SQL, SOQL, HubSpot, Attio blocks) | `connection-queries/` | Use before configuring a model |
 | Create or update a data model, map columns, add joins, preview, save | `configure-data-model/` | Use after the query works |
 
+### Automation
+
+| User intent | Sub-folder | Notes |
+|-------------|------------|-------|
+| Create or edit a flow, agent, or workflow | `flow-authoring/` | Read the flow resources first; do not paste a flow from memory |
+| Create a project, add a task, turn a plan into tasks | `projects-and-tasks/` | Read `file://projects/guide.md` first |
+
 ### Disambiguation rules
 
 When intent is ambiguous, apply these rules:
@@ -134,6 +218,9 @@ When intent is ambiguous, apply these rules:
 - **Churn risk vs Book of business**: Churn risk = ranked danger report with drivers and plays. Book of business = personal portfolio snapshot with health + drill-down. If they say "how are my accounts doing?", use book-of-business. If they say "which accounts might churn?", use churn-risk-report.
 - **Value email vs Account brief**: Value email = outbound to the customer (achievements, CTA). Account brief = internal deep-dive for stakeholders.
 - **Lead reports vs Expansion/Upsell**: Lead reports = net-new, trial, or free-tier accounts that are product-qualified. Expansion/Upsell = existing paying customers with room to grow.
+- **Prioritize my day vs Book of business vs Churn risk**: Prioritize my day = today's open action cards, plus Critical or At risk accounts and near renewals that have no card. Book of business = a portfolio snapshot. Churn risk = a ranked danger report, not a daily plan.
+- **Success plan vs Projects and tasks**: Success plan = the written 30/60/90 plan. Projects and tasks = creating those items in FunnelStory. If they want the plan written, use success-plan. If they want the tasks created, use projects-and-tasks.
+- **Flow authoring vs Data model setup**: Flow authoring = an agent or workflow. Data model setup = mapping source data into FunnelStory. A flow that queries a model still starts in flow-authoring.
 
 ## Audience
 
@@ -151,3 +238,4 @@ These skills serve four personas:
 - **`references/linking-conversations-to-accounts.md`** — How to locate support data in a workspace and link it to accounts. Read before any per-account ticket or conversation query. Used by `account-support-history/` and `account-brief/`; also applies to `meeting-prep/` and `churn-risk-report/`.
 - **`references/troubleshooting.md`** — Common problems and how to handle them (MCP not connected, empty results, ambiguous names, etc.).
 - **`references/use-cases.md`** — Persona-specific trigger examples mapped to sub-skills.
+- **`file://semantic/usage.md`** — Column rules for the semantic database. Shared conventions above defer to it.

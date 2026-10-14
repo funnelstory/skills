@@ -13,13 +13,13 @@ Use this when the user asks for a customer-facing QBR, an external QBR, or wants
 ## Step 1: Identify the Account
 
 ```sql
-SELECT account_id, name, domain, amount, health_score, prediction_score, expires_at
+SELECT account_id, name, domain, amount, expires_at
 FROM accounts
-WHERE name LIKE '%AccountName%'
-LIMIT 10
+WHERE name LIKE '%AccountName%' OR domain LIKE '%AccountName%'
+LIMIT 25
 ```
 
-Confirm with the user. Note `account_id` and `domain`.
+Follow **Resolving a named account** in the root `SKILL.md`. Because this deck goes to the customer, if more than one plausible candidate exists, confirm the choice with the user before building. Note `account_id` and `domain`.
 
 ## Step 2: Pull Account Data
 
@@ -50,6 +50,8 @@ Same query set as `qbr-internal/` — pull accounts, activities, notes, meetings
 - Negative needle movers or risk flags (competitor mentions, pricing concerns)
 - Support ticket details (unless the user specifically asks — and then frame as "issues resolved")
 - Raw sentiment scores
+- **Internal conversations** — anything labelled internal by `references/linking-conversations-to-accounts.md` (colleagues discussing the customer). Only customer-present conversations may inform content, and even then paraphrase rather than quote.
+- Anything the workspace profile `instructions` mark as not for external use
 
 ## Step 4: Structure the Deck
 
@@ -69,7 +71,7 @@ Same query set as `qbr-internal/` — pull accounts, activities, notes, meetings
 
 ## Step 5: Output Format
 
-- **Default**: PowerPoint (.pptx) — read and follow `/mnt/skills/public/pptx/SKILL.md`
+- **Default**: PowerPoint (.pptx) — follow **Output files** in the root `SKILL.md`
 - **Alternative**: HTML presentation or Markdown
 - Tone: professional, warm, partnership-oriented. No internal jargon. No hedging language.
 

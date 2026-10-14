@@ -1,6 +1,6 @@
 # Feature Requests Dashboard
 
-Aggregate feature requests across accounts from `needle_movers`, `notes`, `topics`, and `tickets`. Rank by frequency, ARR weight, and segment. For PM and VP of Product to prioritize the product roadmap based on customer signal.
+Aggregate feature requests across accounts from `needle_movers` (`label = 'feature_request'`), `notes`, `content_labels`, and `tickets`. Rank by frequency, value weight (`aggregate_amount`), and segment. For PM and VP of Product to prioritize the product roadmap based on customer signal.
 
 ## Audience
 
@@ -47,13 +47,14 @@ LIMIT 50
 
 Strip HTML from content. Extract the specific feature mentioned.
 
-### From topics (if available)
+### From content labels (if available)
+
+Themes live on `content_labels.themes` (a JSON object keyed by theme slug), not `topics`.
 
 ```sql
-SELECT topic_name, account_id, sentiment, timestamp
-FROM topics
-WHERE topic_name LIKE '%feature%' OR topic_name LIKE '%request%'
-ORDER BY timestamp DESC
+SELECT reference_type, reference_id, account_id, themes
+FROM content_labels
+WHERE themes != '{}'
 LIMIT 50
 ```
 
@@ -72,10 +73,10 @@ WHERE account_id IN ('<id1>', '<id2>', ...)
 
 Group feature requests by theme/title. For each theme:
 - **Frequency:** Number of accounts requesting it
-- **ARR weight:** Sum of `amount` for requesting accounts
+- **ARR weight:** Sum of `aggregate_amount` for requesting accounts
 - **Segment distribution:** Which segments are asking (Enterprise vs SMB, etc.)
 - **Recency:** Most recent request date
-- **Sentiment:** Average sentiment from related topics/notes (if available)
+- **Sentiment:** Average sentiment from related `content_labels` or notes (if available)
 
 Rank by a composite of frequency + ARR weight. Document the ranking formula.
 

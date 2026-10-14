@@ -33,12 +33,12 @@ Several matches is normal. Workspaces carry stale duplicates, and some carry one
 **per site** — a parent plus a dozen site records is a real shape, not an error. Note that
 sites frequently **share a domain**, so `domain` alone does not identify an account.
 
-Rank candidates by non-zero `amount`, presence of `assignees`, and recent activity volume.
+Rank candidates by non-zero `aggregate_amount` (fall back to `amount`), presence of `assignees`, and recent activity volume.
 Proceed with the top candidate, state in one line which you chose and why, and list the
 alternatives at the end so the user can redirect.
 
-Ask first only when a parent account and its sites both match — rollup and single-site
-briefs differ completely, and no query can rank that choice.
+Ask first only when a parent account and its children both match — rollup and single-site
+briefs differ completely, and no query can rank that choice. Follow **Resolving a named account** in the root `SKILL.md`.
 
 If no match is found, ask the user to verify the account name or try a partial spelling.
 
@@ -65,12 +65,25 @@ WHERE account_id = '<account_id>'
 
 Key fields (subject to workspace overrides from Step 0):
 
-- `amount` — contract value; **report it under the name the workspace profile specifies**
-- `expires_at` — renewal date
-- `health_score` — overall health (1–10); a workspace may direct you to a property such as a custom health index instead
-- `prediction_score` — churn/retention score (-1 to 1); convert to 0–100 via `(score * 50) + 50`. Lower = higher churn risk. Some workspaces forbid surfacing this — check `instructions`.
+- `aggregate_amount` — portfolio value; on a parent this is the rollup. `amount` is the account's own value and is often empty on a parent. **Report value under the name the workspace profile specifies.**
+- `earliest_child_expiry` — renewal timing for a parent; otherwise `expires_at`
+- `health_score` — displayed health, already 0–100. Band it per **Health tiers** in the root `SKILL.md`. A workspace may direct you to a different property; if so, use that and say so.
+- `prediction` — text outcome (`retention`, `churn`, or empty). `prediction_score` is −1 to 1; `health_score` is already `50 + trunc(prediction_score * 100 / 2)`. Some workspaces forbid surfacing prediction — check `instructions`.
 - `license_utilization`, `feature_adoption`, `activity_score`, `support_sentiment`
-- `properties` JSON — CSM, account owner, TAM, renewal specialist, region, tenant settings, and any workspace-specific health factors
+- `product_engagement` — 0 inactive, 1 monthly, 2 weekly, 3 daily
+- `properties` JSON — CSM, account owner, renewal owner, region, and any workspace-specific fields
+
+### Account profile (read this before stitching raw tables)
+
+Read `file://semantic/account_profiles.md`, then:
+
+```sql
+SELECT data, updated_at
+FROM account_profiles
+WHERE account_id = '<account_id>'
+```
+
+Use `data.recent` and `data.long_term` for the narrative, stakeholders, concerns, and what is going well. Fall back to notes, meetings, and activities only for gaps the profile does not cover. Commitments, outcomes, and concerns also live as rows in `facts` (`kind` is `commitment`, `outcome`, `concern`, `value`, or `stakeholder`).
 
 ### Product Usage & Activities (last 90 days)
 
@@ -259,8 +272,7 @@ in the prose, not only in the provenance line.
 
 ### PDF (default)
 
-Read and follow `/mnt/skills/public/pdf/SKILL.md`. Use `reportlab` to produce a clean, formatted PDF with section headers, dividers, and a cover line (account name + date).
-Save to `/mnt/user-data/outputs/[account-name]-account-brief.pdf` and use `present_files`.
+Follow **Output files** in the root `SKILL.md`. Produce a clean, formatted PDF with section headers, dividers, and a cover line (account name + date), named `<account-name>-account-brief.pdf`.
 
 ### Markdown (in-chat)
 
@@ -268,8 +280,7 @@ Render the structured brief directly using Markdown headers and tables.
 
 ### Word Document (.docx)
 
-Read and follow `/mnt/skills/public/docx/SKILL.md`.
-Save to `/mnt/user-data/outputs/[account-name]-account-brief.docx` and use `present_files`.
+Follow **Output files** in the root `SKILL.md`; name the file `<account-name>-account-brief.docx`.
 
 ---
 

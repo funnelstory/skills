@@ -7,6 +7,42 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.2.0] — 2026-10-14
+
+Brings every sub-skill onto the product's health tiers and the current semantic database, and routes three workflows the MCP already supports.
+
+### Added
+
+- **Shared conventions** in the root `SKILL.md`: named-account resolution, health tiers, value and renewal, needle-mover filters, support data, missing data, and output files.
+- **`flow-authoring/`** — routes flow work to the MCP flow resources (`file://flow/guide.md` and the guides it names) and to `save_flow`, `edit_flow`, `get_flows`, `preview_flow_triggers`, `run_flow`, and `debug_flow_step`.
+- **`projects-and-tasks/`** — `create_project`, `update_project`, `create_task`, and `add_task_note`, after reading `file://projects/guide.md`. Project create and update are admin-only.
+- **`prioritize-my-day/`** — today's open action cards, then Critical or At risk accounts and near renewals that have no card.
+
+### Changed
+
+- **Health tiers match Focus Areas:** Critical at 45 or below, At risk from 46 to 54, On track at 55 or above, on the displayed `health_score` (`50 + trunc(prediction_score * 100 / 2)`). Drivers sit beside the tier and do not change it. Accounts with no score are Unscored.
+- **Identity lookup** calls `who_am_i` first. Authentication is described as OAuth 2.0 with PKCE.
+- Portfolio value is `aggregate_amount`. A parent's renewal date is `earliest_child_expiry`. Portfolio skills skip `churned` accounts unless asked.
+- Needle movers follow the product list (`source` `v2` or `relationship_map`) and are reported as impact tiers, not raw integers.
+- Account briefs and meeting prep start from `account_profiles`. Meeting prep uses `calendar_events` for upcoming invites and `content_labels` for themes.
+- `qbr-internal/`, `renewal-dashboard/`, `churn-risk-report/`, and `meeting-prep/` source support data through `references/linking-conversations-to-accounts.md`.
+- `configure-data-model/` distinguishes `edit_data_model` (a partial edit) from `configure_data_model` (create or full replace).
+- Account resolution ranks, proceeds, states the choice, and lists alternatives. It asks first only for parent-versus-child, and for a customer-facing deliverable with more than one plausible match.
+- Output steps are client-neutral. The README table lists every routed folder.
+
+### Removed
+
+- **`qbr-deck/`** — unrouted duplicate of `qbr-internal/`. Use `qbr-internal/` or `qbr-external/`.
+- Workspace-specific entitlement fields. Skills inspect `properties` for whatever the workspace carries.
+- The reference to a `get_account` tool, and OTP login as the default authentication step.
+
+### Upgrading
+
+- **Claude Code / Cursor (symlinked):** `git pull` in the skills directory.
+- **Claude Desktop / web:** re-download and re-add the **entire** skills directory, then remove the previous version.
+
+---
+
 ## [1.1.0] — 2026-08-28
 
 Broadens support-data coverage across ticketing and conversation platforms, and adds a

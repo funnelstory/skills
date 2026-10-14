@@ -18,7 +18,7 @@ If the user gave an `account_id`, use it directly. Otherwise:
 SELECT account_id, name, domain FROM accounts WHERE name LIKE '%<company>%' LIMIT 5
 ```
 
-If multiple results, ask the user to confirm. Note `account_id` and `domain`. If `domain` is null,
+If multiple results, follow **Resolving a named account** in the root `SKILL.md`. Because this is customer-facing, confirm the account when more than one plausible match exists. Note `account_id` and `domain`. If `domain` is null,
 skip queries that filter by domain.
 
 ### 2. Fetch all account data in parallel
@@ -28,7 +28,8 @@ Pull from these tables simultaneously using `query_semantic_db`:
 - `accounts` — core account info and computed scores
 - `notes` — call transcripts, emails, internal updates
 - `meetings` + `meeting_contacts` + `contacts` — AI-summarized meeting notes
-- `topics` — conversation themes and sentiment
+- `account_profiles` — narrative and stakeholder outcomes. Read `file://semantic/account_profiles.md`.
+- `content_labels` — themes. Do not use `topics`.
 - `activities` — product usage events
 - `users` — count of active users
 - `tasks` — open/closed action items
@@ -53,7 +54,7 @@ Before writing a single line of HTML, spend time identifying the right raw mater
   the structural tension the data reveals (e.g. "fragmented tool stack across 3 platforms" if the
   notes mention GitLab, Bitbucket, and GitHub). Do not manufacture a crisis.
 
-- **What they used before** — scan notes and topics for mentions of competitor products,
+- **What they used before** — scan notes and `content_labels` for mentions of competitor products,
   previous tools, or "before [product]" references. Include this as "Previous solution" in At a
   Glance if found.
 

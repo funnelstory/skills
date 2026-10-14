@@ -27,12 +27,12 @@ Common problems and how Claude should handle them.
 
 ## Ambiguous account name
 
-**What happened:** `SELECT ... WHERE name LIKE '%X%'` returns multiple matches.
+**What happened:** `SELECT ... WHERE name LIKE '%X%' OR domain LIKE '%X%'` returns multiple matches.
 
-**What to do:**
-- List the top 5 matches with name, domain, and ARR.
-- Ask the user to confirm which one.
-- Do NOT guess or pick the first result.
+**What to do:** follow **Resolving a named account** in the root `SKILL.md`.
+- Rank by non-zero `aggregate_amount` (fall back to `amount`), presence of `assignees`, and recent activity — never just take the first row.
+- Proceed with the top candidate, state the choice in one line, and list alternatives at the end.
+- Ask first only when a parent account and its site records both match, or when the deliverable is customer-facing.
 
 ---
 
@@ -42,7 +42,7 @@ Common problems and how Claude should handle them.
 
 **What to do:**
 - Set `limit` to at least 200 on account-list queries.
-- Process in batches if `get_account` is needed per account (batch size ~20).
+- Aggregate in SQL (`GROUP BY account_id`) rather than querying per account; if per-account queries are unavoidable, batch them (~20 accounts per query using `IN (...)`).
 - Show progress: "Found 84 accounts. Processing in batches..."
 - If it exceeds ~200 accounts, ask: "You have a large portfolio. Want me to focus on a specific segment (e.g. at-risk, renewing soon, top ARR)?"
 
@@ -55,7 +55,7 @@ Common problems and how Claude should handle them.
 **What to do:**
 - Skip that section or metric gracefully.
 - Note: "[Field] is not available in this workspace's schema — skipping."
-- Use available proxy fields when reasonable (e.g., if `license_utilization` is missing, compute from `total_users` vs `properties.num_contract_devices`).
+- Use available proxy fields when reasonable (e.g., if `license_utilization` is missing, compute active users or units against a contracted-entitlement field found in `properties`), and state the proxy used.
 - Do NOT fabricate values.
 
 ---

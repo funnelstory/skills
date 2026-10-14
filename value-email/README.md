@@ -7,7 +7,7 @@
 
 ## Step 1 — Confirm
 
-1. **Account name(s)** — one primary account per email unless user explicitly wants a joint customer email.
+1. **Account name(s)** — one primary account per email unless the user explicitly wants a joint customer email. Resolve with **Resolving a named account** in the root `SKILL.md`. Because this goes to the customer, confirm when more than one plausible match exists.
 2. **Recipient persona** (optional): champion vs executive — adjusts tone and depth.
 3. **Format:** Markdown + **HTML body** (email-safe) default; plain Markdown only on request.
 
@@ -16,6 +16,7 @@
 Same data family as account brief (adapt SQL to schema):
 
 - `accounts` — ARR, renewal, health (for internal sanity; do not lead with internal health in customer copy unless framed carefully).
+- `account_profiles` — outcomes and stakeholders. Read `file://semantic/account_profiles.md`. Prefer this over stitching raw tables for the narrative.
 - `activities` — concrete usage wins (volumes, trends last 90 days).
 - `account_metrics_history` / `account_metrics_latest` — KPIs the customer cares about.
 - `notes` / `meetings` — **short** paraphrased wins or quotes (strip HTML; no internal-only content).

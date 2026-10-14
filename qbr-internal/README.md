@@ -16,16 +16,16 @@ Use this when the user asks for an internal QBR, a QBR prep deck, or a quarterly
 
 ## Step 1: Identify the Account
 
-Ask the user which account they want to generate a QBR deck for, then find it:
+If the user hasn't named an account, ask for it. Then resolve it:
 
 ```sql
 SELECT account_id, name, domain, amount, health_score, prediction_score, expires_at
 FROM accounts
-WHERE name LIKE '%AccountName%'
-LIMIT 10
+WHERE name LIKE '%AccountName%' OR domain LIKE '%AccountName%'
+LIMIT 25
 ```
 
-Confirm the correct account with the user before proceeding. Note the `account_id` and `domain` — you'll need both for joins.
+Follow **Resolving a named account** in the root `SKILL.md`: rank, proceed with the top candidate, state the choice, and list alternatives. Ask first only for a parent-vs-site ambiguity. Note the `account_id` and `domain`.
 
 ---
 
@@ -43,12 +43,14 @@ WHERE account_id = '<account_id>'
 
 Key fields to extract:
 
-- `amount` — ARR
+Field names below are defaults; the workspace profile `instructions` may rename or redirect them.
+
+- `amount` — contract value; report it under the name the workspace profile specifies (e.g. ARR)
 - `expires_at` — renewal date
-- `health_score` — overall health (1–10)
+- `health_score` — displayed health, already 0–100. Band it per **Health tiers** in the root `SKILL.md`
 - `prediction_score` — churn/retention score (-1 to 1). Convert to 0–100 via `(prediction_score * 50) + 50`. Lower = higher churn risk.
 - `license_utilization`, `feature_adoption`, `activity_score`, `support_sentiment`, `conversation_sentiment`
-- `properties` JSON — contains CSM, account owner, TAM, renewal specialist, `num_contract_devices`, `num_active_devices`, `num_inactive_devices`, region, tenant_settings
+- `properties` JSON — typically CSM, account owner, renewal owner, region, and any workspace-specific entitlement fields (e.g. contracted vs. active seats or units). Inspect the keys present rather than assuming names.
 
 ### Notes (last 90 days)
 
@@ -74,20 +76,11 @@ GROUP BY activity_name
 ORDER BY total DESC
 ```
 
-### Support Tickets (last 90 days)
+### Support History (last 90 days)
 
-```sql
-SELECT t.title, t.status, t.priority, t.sentiment, t.timestamp, t.resolved_at,
-       t.contact_name, t.assignee_email, t.link,
-       json_extract(t.key, '$.ticket_id') AS ticket_number
-FROM tickets t
-JOIN ticket_contacts tc ON tc.ticket_id = t.id
-JOIN contacts c ON c.id = tc.contact_id
-WHERE c.domain = '<account_domain>'
-  AND t.timestamp >= datetime('now', '-90 days')
-ORDER BY t.timestamp DESC
-LIMIT 20
-```
+Do not use a fixed ticket query. Read **`references/linking-conversations-to-accounts.md`** and follow it: confirm which table holds support data in this workspace, choose the highest-coverage linkage per source, and exclude machine-generated noise. Keep tickets and chat conversations as separate bands, and record a one-line provenance note (table, source, linkage, coverage) for the Support slide.
+
+Never `SELECT *` from `tickets` or `conversations`.
 
 ### Meetings (last 90 days)
 
@@ -102,6 +95,8 @@ WHERE c.domain = '<account_domain>'
 ORDER BY m.timestamp DESC
 LIMIT 15
 ```
+
+This join matches contacts by domain. If other accounts share this domain (check with `SELECT COUNT(*) FROM accounts WHERE domain = '<account_domain>'`), the results can include their meetings — say so on the slide rather than presenting them as this account's.
 
 For high-stakes accounts, read the full `summary` text rather than relying only on needle movers — raw summaries contain specific initiatives, competitor names, and expansion signals that pre-computed insights may miss.
 
@@ -157,18 +152,18 @@ LIMIT 10
 
 ## Step 3: Structure the QBR Deck
 
-Read `/mnt/skills/public/pptx/SKILL.md` before creating the PowerPoint.
+See **Output files** in the root `SKILL.md` for how to produce the deck.
 
 Build the deck with these sections:
 
 1. **Title Slide** — Account name, quarter (e.g. Q1 2026), date, CSM name (from `properties.CSM`). Label: "Internal QBR — Not for customer distribution."
-2. **Executive Summary** — Health score, prediction score (0–100), ARR, renewal date, 2–3 key wins, top risks
-3. **Account Overview** — Contract value, devices (contracted / active / inactive from `properties`), total users, region, account owner, renewal specialist
+2. **Executive Summary** — Health score and risk band, prediction score (0–100, if the workspace allows surfacing it), contract value, renewal date, 2–3 key wins, top risks
+3. **Account Overview** — Contract value, entitlement vs. active usage (from workspace-specific `properties` fields, if present), total users, region, account owner, renewal owner
 4. **Health & Prediction Trend** — Health score, prediction score trend from `prediction_account_history`, top risk factors from `point.factors`
-5. **Product Usage & Engagement** — Device usage from `account_metrics_history`, activity breakdown from `activities`
+5. **Product Usage & Engagement** — Usage trends from `account_metrics_history`, activity breakdown from `activities`
 6. **Meetings & Notes** — Key takeaways from `meetings.summary` and `notes.content` (strip HTML), action items, participants
-7. **Support** — Open ticket count, recently resolved tickets, avg sentiment, notable issues from `tickets`
-8. **Needle Movers** — Open needle movers ranked by `ABS(impact)`, grouped by label; flag critical negatives (impact ≤ -5)
+7. **Support** — Open items first, recently resolved, sentiment, notable issues; tickets and conversations as separate bands; provenance line
+8. **Needle Movers** — Open needle movers with `source IN ('v2', 'relationship_map')`, grouped by label; flag **negative high** (impact −7 or below). Report the tier, not the raw integer.
 9. **Next Quarter Priorities** — Recommended actions based on open needle movers, prediction `recommendations`, and renewal timeline
 10. **Action Items** — Owners, due dates, links
 
@@ -176,9 +171,9 @@ Build the deck with these sections:
 
 ## Step 4: Output Format
 
-- **Default**: PowerPoint (.pptx) — read and follow `/mnt/skills/public/pptx/SKILL.md`
-- **Alternative**: Word (.docx) — read and follow `/mnt/skills/public/docx/SKILL.md`
-- Save final file to `/mnt/user-data/outputs/`
+- **Default**: PowerPoint (.pptx)
+- **Alternative**: Word (.docx)
+- Follow **Output files** in the root `SKILL.md`.
 
 ---
 
@@ -189,5 +184,6 @@ Build the deck with these sections:
 - **Timestamps**: Use `datetime('now', '-90 days')` for relative time. All timestamps are ISO 8601 strings.
 - **Prediction score display**: Convert -1→1 scale to 0–100 via `(score * 50) + 50`.
 - **Notes content**: Strip HTML tags before including in slides.
-- **Missing data**: Skip sections gracefully if data is unavailable; note it on the slide.
+- **Missing data**: Keep the slide and state either "No data available" or "Not available in this workspace" — never drop it silently.
+- **Support data**: always via `references/linking-conversations-to-accounts.md`.
 - **Sparse needle movers**: If empty, lean more heavily on meeting summaries and notes for qualitative context — they often contain signals needle movers didn't capture.
