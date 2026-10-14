@@ -8,10 +8,11 @@ Generate a structured, professional account summary brief for a named customer u
 
 Call `read_resource` on `file://workspace/profile.json` before any query.
 
-Honor its `instructions` verbatim. Workspaces override metric semantics — one may
-require `amount` be reported as TCV rather than ARR, another may redirect health to a
-workspace-specific property and forbid querying the default score at all. The field
-names in this README are defaults, not guarantees.
+Honor its `instructions` verbatim, with one exception: health is product-defined (see
+**Health tiers** in the root `SKILL.md`) and is not redirected or re-banded by the profile.
+Workspaces may override other semantics — one may require `amount` be reported as TCV
+rather than ARR, another may forbid surfacing prediction or health in customer-facing
+output. The field names in this README are defaults, not guarantees.
 
 If `instructions` already records support-data findings, use them and skip the discovery
 in Step 2.
@@ -67,7 +68,7 @@ Key fields (subject to workspace overrides from Step 0):
 
 - `aggregate_amount` — portfolio value; on a parent this is the rollup. `amount` is the account's own value and is often empty on a parent. **Report value under the name the workspace profile specifies.**
 - `earliest_child_expiry` — renewal timing for a parent; otherwise `expires_at`
-- `health_score` — displayed health, already 0–100. Band it per **Health tiers** in the root `SKILL.md`. A workspace may direct you to a different property; if so, use that and say so.
+- `health_score` — displayed health, already 0–100. Band it per **Health tiers** in the root `SKILL.md`. Always use this score, even if the profile names another property, so the brief matches the UI.
 - `prediction` — text outcome (`retention`, `churn`, or empty). `prediction_score` is −1 to 1; `health_score` is already `50 + trunc(prediction_score * 100 / 2)`. Some workspaces forbid surfacing prediction — check `instructions`.
 - `license_utilization`, `feature_adoption`, `activity_score`, `support_sentiment`
 - `product_engagement` — 0 inactive, 1 monthly, 2 weekly, 3 daily
@@ -286,7 +287,7 @@ Follow **Output files** in the root `SKILL.md`; name the file `<account-name>-ac
 
 ## Implementation Notes
 
-- **Workspace overrides win.** Metric names and health conventions come from the profile `instructions`, not from this file.
+- **Workspace overrides win** for terminology, value labels, ownership, and visibility. Health score and tiers are product-defined and do not change.
 - **Verify columns before selecting them** with `pragma_table_info`; schemas differ between workspaces.
 - **Support data**: always via `references/linking-conversations-to-accounts.md`. Never assume `tickets` is populated, and never assume a populated `ticket_contacts` implies populated `tickets`.
 - **Never `SELECT *`** on `tickets` or `conversations`.

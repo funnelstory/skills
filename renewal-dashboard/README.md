@@ -63,7 +63,7 @@ Band each account using **Health tiers** in the root `SKILL.md`:
 | **At risk** | 46 to 54 |
 | **On track** | 55 or above |
 
-No score is **Unscored**. List the other signals (negative needle movers, prediction, activity trend, sentiment) as drivers beside the tier. Do not change the tier because of them. If the workspace profile names different thresholds, use those and say so in a "Method" footnote.
+No score is **Unscored**. List the other signals (negative needle movers, prediction, activity trend, sentiment) as drivers beside the tier. Do not change the tier because of them. Tiers are product-defined and match the FunnelStory UI; do not apply alternative thresholds from the workspace profile. State the tier rule in a "Method" footnote.
 
 ## Step 4 — Output
 

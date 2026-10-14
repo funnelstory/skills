@@ -39,6 +39,7 @@ Everything requires the FunnelStory MCP so the agent can query your Customer Int
 | `adoption-funnel/` | Feature-level adoption across the customer base (PM) |
 | `customer-roi-stories/` | Batch ROI snippets across accounts (marketing) |
 | `connection-queries/` | Connection query syntax (SQL, SOQL, HubSpot, Attio blocks) |
+| `workspace-profile-setup/` | Draft and test the workspace profile every skill reads first (admin onboarding) |
 | `configure-data-model/` | Data model configuration via MCP (mappings, joins, preview, save) |
 | `flow-authoring/` | Create or edit a flow; reads the MCP flow guides |
 | `projects-and-tasks/` | Create a project or task, or add a note to a task |

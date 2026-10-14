@@ -1,18 +1,19 @@
 ---
 name: funnelstory
-version: 1.2.0
+version: 1.3.0
 description: >
   FunnelStory MCP toolkit for Customer Success, Product, and Marketing teams. Use this skill
   whenever a request needs customer or account data, even if FunnelStory is not named:
   "prep me for my call with <account>", "tell me about <account>", "how's my book",
   "what should I do today", "who's renewing next quarter", "which accounts might churn",
   "what's open with <account>", "build a QBR for <account>", "draft a value email",
-  "create a flow", "add a task". Covers account briefs, book of business, a daily priority
+  "create a flow", "add a task", "set up our workspace profile". Covers account briefs, book of business, a daily priority
   list, meeting prep, support history, QBR decks (internal or customer-facing), case studies,
   lead/PQL reports, expansion and upsell dashboards, churn risk reports, renewal dashboards,
   adoption gap analysis, adoption funnels, health score breakdowns, success plans, value
   emails, executive sponsor tracking, feature request dashboards, customer ROI stories,
-  projects and tasks, flow authoring, data model configuration, and connection query authoring.
+  projects and tasks, flow authoring, workspace profile setup, data model configuration, and
+  connection query authoring.
   Requires FunnelStory MCP to be connected.
 ---
 
@@ -26,7 +27,7 @@ For persona-specific trigger examples, see `references/use-cases.md`.
 ## Prerequisites
 - **Read context resources first (always).** Before doing any work on a request — querying data, routing to a sub-skill, or producing a deliverable — call the **`read_resource`** tool with the relevant resource URI(s) to load the current context for the task. The MCP server exposes reference context (schema, field definitions, workspace configuration, and similar) addressable by URI. Identify which resource(s) the request depends on, read them with `read_resource`, and only then proceed. Do not rely on assumed schema, field names, or prior-session memory when a resource can confirm the current state — read first, then act.
 - **FunnelStory MCP** must be connected. Authentication is OAuth 2.0 with PKCE; see `MCP_DOCUMENTATION.md`. Do not start an OTP login unless `who_am_i` fails and the connected server exposes a `login` tool.
-- **Read `file://workspace/profile.json` before querying.** Its `instructions` field may override metric names, health conventions, or which fields may be surfaced. Workspace instructions take precedence over the defaults in any sub-skill README.
+- **Read `file://workspace/profile.json` before querying.** Its `instructions` field may override terminology, value labels, ownership fields, and which fields may be surfaced. Workspace instructions take precedence over the defaults in any sub-skill README — **except health**, which is product-defined (see **Health tiers**).
 - Use **`query_semantic_db`** to run SQLite against the semantic database. It takes raw SQL directly; no connection lookup is required. Set limits high enough to avoid truncation (e.g. 25+ rows).
 - Before writing queries, read `file://semantic/usage.md` and `file://semantic/schema.sql` via **`read_resource`**. Table and column availability differ between workspaces; confirm with `SELECT name FROM pragma_table_info('<table>')` when in doubt.
 - **JSON arrays:** Use `json_each(col)` for proper JSON array columns (e.g. `assignees`). For text-based array fields (e.g. `needle_movers.account_ids`), use `INSTR(col, value) > 0` instead.
@@ -95,7 +96,7 @@ Match on name **and** domain (`name LIKE '%X%' OR domain LIKE '%X%'`, limit 25).
 
 - No score means no tier. Say **Unscored**.
 - The tier comes from the score alone. Report other signals (negative needle movers, an overdue renewal, prediction outcome `churn`, a weak relationship) as **drivers** next to the tier. Do not change the tier because of them.
-- If the workspace profile names a different health index or thresholds, use those and say so.
+- **Health is product-defined and not overridable.** Always use `health_score` and these tiers so Claude and the FunnelStory UI never disagree. If the workspace profile names a different health index or different thresholds, keep `health_score` and these tiers, and tell the user once that the profile asked for something else and the product definition was used. The profile may still restrict *where* health appears (for example, never in customer-facing output) — that is a visibility rule, not a redefinition.
 
 ### Value and renewal
 
@@ -186,6 +187,12 @@ Match the user's intent to **exactly one** sub-folder. Read the `README.md` insi
 | ROI stories, customer outcomes for marketing, batch ROI | `customer-roi-stories/` | Multi-account batch; compact marketing-ready snippets |
 | Full case study, publication-ready HTML | `case-study/` | Single-account deep editorial narrative |
 
+### Workspace setup
+
+| User intent | Sub-folder | Notes |
+|-------------|------------|-------|
+| Set up, review, or update the workspace profile and its `instructions`; onboard a new workspace | `workspace-profile-setup/` | `admin` or `super_admin` only. Otherwise stop and tell them to ask a workspace admin. Drafts and tests; the admin applies it on Workspace Grounding |
+
 ### Data model setup
 
 | User intent | Sub-folder | Notes |
@@ -224,12 +231,13 @@ When intent is ambiguous, apply these rules:
 
 ## Audience
 
-These skills serve four personas:
+These skills serve five personas:
 
 - **CSM (Customer Success Manager)**: Directly owns accounts. Requests are usually scoped to "my book" or a named account. Wants actionable next steps.
 - **VP of CS**: Manages a team. Requests are scoped to a segment, team, or all accounts. Wants aggregate patterns and coverage gaps.
 - **PM / VP of Product**: Cares about feature-level signals across the customer base. Requests are typically workspace-wide with optional segment filters.
 - **PMM / VP of Marketing**: Needs customer proof points and ROI stories for marketing collateral. Requests span multiple accounts.
+- **Workspace admin**: Sets up and maintains the workspace profile that every other skill reads first. Only `admin` and `super_admin` run this. Anyone else is told to ask a workspace admin.
 
 ## Shared resources
 
